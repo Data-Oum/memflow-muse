@@ -236,7 +236,10 @@ export const Route = createFileRoute("/")({
       { name: "keywords", content: KEYWORDS },
       { name: "author", content: FULL_NAME },
       { name: "application-name", content: "Amit Chakraborty Portfolio" },
-      { name: "robots", content: "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" },
+      {
+        name: "robots",
+        content: "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+      },
       { name: "theme-color", content: "#16A07C" },
       { name: "color-scheme", content: "light" },
 

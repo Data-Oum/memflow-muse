@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   mem0 as mockMem0,
   CATEGORY_COLORS,
@@ -21,27 +14,19 @@ import {
 } from "@/lib/api/memory.functions";
 import { useInView } from "@/hooks/use-in-view";
 import { useScrollSpy } from "@/hooks/use-scroll-spy";
-import { useTypewriter } from "@/hooks/use-typewriter";
+import { useGsapReveal } from "@/hooks/use-gsap-reveal";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    SHARED UTILITIES
 ───────────────────────────────────────────────────────────────────────────── */
 
-function Section({
-  id,
-  children,
-  full,
-}: {
-  id: string;
-  children: ReactNode;
-  full?: boolean;
-}) {
-  const { ref, inView } = useInView<HTMLElement>(0.12);
+function Section({ id, children, full }: { id: string; children: ReactNode; full?: boolean }) {
+  const ref = useGsapReveal<HTMLElement>();
   return (
     <section
       id={id}
       ref={ref}
-      className={`fade-up ${inView ? "in" : ""}`}
+      className="reveal-section section-mobile-pad"
       style={{
         padding: "96px 24px",
         maxWidth: full ? "100%" : 1080,
@@ -147,12 +132,8 @@ function Nav() {
               textDecoration: "none",
               transition: "color 0.2s",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.color = "var(--signal)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "var(--ink-primary)")
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--signal)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-primary)")}
           >
             amit.co
           </a>
@@ -214,12 +195,8 @@ function Nav() {
                 textDecoration: "none",
                 transition: "background 0.2s",
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "rgba(22,160,124,0.15)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "var(--signal-light)")
-              }
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(22,160,124,0.15)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "var(--signal-light)")}
             >
               Open to roles →
             </a>
@@ -318,42 +295,48 @@ function Nav() {
    HERO
 ───────────────────────────────────────────────────────────────────────────── */
 
-function HeroStagger({ children }: { children: ReactNode }) {
-  return (
-    <div>
-      <style>{`
-        .hero-stagger > * { opacity: 0; transform: translateY(20px); animation: heroIn 0.6s var(--ease) forwards; }
-        @keyframes heroIn { to { opacity: 1; transform: translateY(0); } }
-        .hero-stagger > *:nth-child(1) { animation-delay: 0ms; }
-        .hero-stagger > *:nth-child(2) { animation-delay: 80ms; }
-        .hero-stagger > *:nth-child(3) { animation-delay: 160ms; }
-        .hero-stagger > *:nth-child(4) { animation-delay: 240ms; }
-        .hero-stagger > *:nth-child(5) { animation-delay: 320ms; }
-        .hero-stagger > *:nth-child(6) { animation-delay: 400ms; }
-        .hero-stagger > *:nth-child(7) { animation-delay: 480ms; }
-      `}</style>
-      <div className="hero-stagger">{children}</div>
-    </div>
-  );
-}
+const PORTRAIT_URL = "https://devamit.co.in/amit-portrait.jpg";
 
 function Hero() {
-  const [phase, setPhase] = useState<"intro" | "content">("intro");
-  const intro =
-    '> mem0.search("staff frontend engineer, india")\n[connecting to memory store...]\n[retrieved: 1 match]';
-  const { typed, done } = useTypewriter(intro, 18, phase === "intro");
+  const textRef = useRef<HTMLDivElement>(null);
+  const imageRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
+  // GSAP entrance — runs immediately, no loading gate
   useEffect(() => {
-    if (done) {
-      const t = window.setTimeout(() => setPhase("content"), 600);
-      return () => window.clearTimeout(t);
-    }
-  }, [done]);
+    if (typeof window === "undefined") return;
+
+    import("gsap").then(({ gsap }) => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+      // Portrait slides in from the right
+      tl.fromTo(
+        imageRef.current,
+        { opacity: 0, x: 48, scale: 0.94 },
+        { opacity: 1, x: 0, scale: 1, duration: 0.9 },
+      );
+
+      // Text items stagger up
+      const items = textRef.current?.querySelectorAll(".h-item");
+      if (items?.length) {
+        tl.fromTo(
+          items,
+          { opacity: 0, y: 22 },
+          { opacity: 1, y: 0, duration: 0.65, stagger: 0.08 },
+          "-=0.6",
+        );
+      }
+
+      // Scroll indicator fades in last
+      tl.fromTo(scrollRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5 }, "-=0.2");
+    });
+  }, []);
 
   const stats = [
-    { v: "8+", l: "Years shipping" },
-    { v: "18+", l: "Production apps" },
+    { v: "8+", l: "Years" },
+    { v: "18+", l: "Apps shipped" },
     { v: "21", l: "Engineers led" },
+    { v: "50K+", l: "Peak DAU" },
   ];
 
   return (
@@ -363,260 +346,396 @@ function Hero() {
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-        padding: "120px 24px 64px",
-        background:
-          "radial-gradient(ellipse 900px 500px at 50% 40%, rgba(22,160,124,0.06) 0%, transparent 65%)",
+        padding: "80px 24px 60px",
         position: "relative",
+        overflow: "hidden",
       }}
     >
-      {phase === "intro" && (
-        <div
-          style={{
-            background: "var(--bg-surface)",
-            border: "1px solid var(--edge-signal)",
-            borderRadius: "var(--r-md)",
-            padding: "16px 24px",
-            maxWidth: 480,
-            fontFamily: "var(--font-mono)",
-            fontSize: 13,
-            color: "var(--signal)",
-            lineHeight: 1.8,
-            whiteSpace: "pre-wrap",
-            textAlign: "left",
-            boxShadow: "var(--shadow-md)",
-            transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
-            opacity: done ? 0 : 1,
-            transform: done ? "scale(0.97)" : "scale(1)",
-          }}
-        >
-          {typed}
-          <span style={{ opacity: 0.6 }}>▊</span>
-        </div>
-      )}
-      {phase === "content" && (
-        <div style={{ maxWidth: 760 }}>
-          <HeroStagger>
+      {/* Ambient background glow */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse 700px 500px at 70% 40%, rgba(22,160,124,0.07) 0%, transparent 60%)," +
+            "radial-gradient(ellipse 400px 300px at 20% 80%, rgba(22,160,124,0.04) 0%, transparent 60%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        style={{
+          maxWidth: 1080,
+          margin: "0 auto",
+          width: "100%",
+          display: "grid",
+          gridTemplateColumns: "1fr auto",
+          gap: "clamp(32px, 5vw, 80px)",
+          alignItems: "center",
+        }}
+      >
+        {/* ── Left: text ── */}
+        <div ref={textRef} style={{ maxWidth: 600 }}>
+          {/* Badge */}
+          <span
+            className="h-item"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              background: "var(--signal-light)",
+              border: "1px solid var(--signal-border)",
+              borderRadius: "var(--r-full)",
+              padding: "5px 14px 5px 10px",
+              marginBottom: 28,
+              opacity: 0, // GSAP takes over
+            }}
+          >
+            <span
+              className="pm-pulse"
+              aria-hidden
+              style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--signal)" }}
+            />
             <span
               style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                color: "var(--signal)",
+                letterSpacing: "0.06em",
+              }}
+            >
+              AVAILABLE NOW · REMOTE ONLY
+            </span>
+          </span>
+
+          {/* Name */}
+          <h1
+            className="h-item"
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontStyle: "italic",
+              fontSize: "clamp(2.8rem, 6.5vw, 5.5rem)",
+              color: "var(--ink-primary)",
+              lineHeight: 1.02,
+              fontWeight: 400,
+              marginBottom: 16,
+              opacity: 0,
+            }}
+          >
+            Amit
+            <br />
+            Chakraborty
+          </h1>
+
+          {/* Role */}
+          <div
+            className="h-item"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 13,
+              color: "var(--ink-tertiary)",
+              letterSpacing: "0.05em",
+              marginBottom: 24,
+              opacity: 0,
+            }}
+          >
+            Principal Architect <span style={{ color: "var(--signal)" }}>·</span> AI-Native{" "}
+            <span style={{ color: "var(--signal)" }}>·</span> React{" "}
+            <span style={{ color: "var(--signal)" }}>·</span> mem0
+          </div>
+
+          {/* Tagline */}
+          <p
+            className="h-item"
+            style={{
+              fontSize: 17,
+              color: "var(--ink-secondary)",
+              lineHeight: 1.65,
+              marginBottom: 32,
+              maxWidth: 460,
+              opacity: 0,
+            }}
+          >
+            8+ years building production-grade AI, mobile, and web systems. Founding Engineer. 21
+            engineers led.
+          </p>
+
+          {/* Stats */}
+          <div
+            className="h-item"
+            style={{
+              display: "flex",
+              gap: 0,
+              marginBottom: 36,
+              flexWrap: "wrap",
+              opacity: 0,
+            }}
+          >
+            {stats.map((s, i) => (
+              <div
+                key={s.l}
+                style={{
+                  padding: "0 24px",
+                  borderLeft: i === 0 ? "none" : "1px solid var(--edge-default)",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "var(--font-serif)",
+                    fontStyle: "italic",
+                    fontSize: "clamp(1.6rem, 3vw, 2.25rem)",
+                    color: "var(--ink-primary)",
+                    lineHeight: 1,
+                  }}
+                >
+                  {s.v}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 10,
+                    color: "var(--ink-tertiary)",
+                    letterSpacing: "0.06em",
+                    marginTop: 5,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {s.l}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* CTAs */}
+          <div
+            className="h-item"
+            style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 36, opacity: 0 }}
+          >
+            <a
+              href="#work"
+              style={{
+                background: "var(--signal)",
+                color: "white",
+                fontSize: 14,
+                fontWeight: 600,
+                padding: "12px 28px",
+                borderRadius: "var(--r-md)",
+                textDecoration: "none",
+                transition: "box-shadow 0.25s var(--ease), transform 0.25s var(--ease)",
+                display: "inline-block",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "var(--shadow-signal)";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "none";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              View My Work ↓
+            </a>
+            <a
+              href="mailto:amit@devamit.co.in"
+              style={{
+                background: "transparent",
+                border: "1px solid var(--edge-default)",
+                color: "var(--ink-secondary)",
+                fontFamily: "var(--font-mono)",
+                fontSize: 13,
+                padding: "12px 20px",
+                borderRadius: "var(--r-md)",
+                textDecoration: "none",
+                transition: "border-color 0.2s, color 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "var(--edge-signal)";
+                e.currentTarget.style.color = "var(--signal)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "var(--edge-default)";
+                e.currentTarget.style.color = "var(--ink-secondary)";
+              }}
+            >
+              amit@devamit.co.in ↗
+            </a>
+          </div>
+
+          {/* Decorative mem0 code snippet */}
+          <div
+            className="h-item"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              background: "#1A1D23",
+              borderRadius: "var(--r-sm)",
+              padding: "7px 14px",
+              opacity: 0,
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: "#28C840",
+                flexShrink: 0,
+              }}
+              aria-hidden
+            />
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#9CA3AF" }}>
+              <span style={{ color: "#16A07C" }}>mem0</span>
+              <span style={{ color: "#8B5CF6" }}>.add</span>
+              <span style={{ color: "#9CA3AF" }}>(</span>
+              <span style={{ color: "#FB923C" }}>"amit is available now"</span>
+              <span style={{ color: "#9CA3AF" }}>)</span>
+            </span>
+          </div>
+        </div>
+
+        {/* ── Right: portrait ── */}
+        <div ref={imageRef} style={{ opacity: 0 }} className="hide-on-mobile">
+          <div
+            style={{
+              position: "relative",
+              width: "clamp(260px, 26vw, 360px)",
+            }}
+          >
+            {/* Photo card */}
+            <div
+              style={{
+                borderRadius: 24,
+                overflow: "hidden",
+                boxShadow: "0 24px 64px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06)",
+                border: "1px solid var(--edge-default)",
+                aspectRatio: "4/5",
+                background: "var(--bg-raised)",
+              }}
+            >
+              <img
+                src={PORTRAIT_URL}
+                alt="Amit Chakraborty — Principal Architect"
+                width={360}
+                height={450}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center top",
+                  display: "block",
+                }}
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+
+            {/* Availability badge */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: -16,
+                left: "50%",
+                transform: "translateX(-50%)",
+                background: "white",
+                border: "1px solid var(--edge-default)",
+                borderRadius: "var(--r-full)",
+                padding: "8px 18px 8px 14px",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
-                background: "var(--signal-light)",
-                border: "1px solid var(--signal-border)",
-                borderRadius: "var(--r-full)",
-                padding: "5px 14px 5px 10px",
+                boxShadow: "var(--shadow-md)",
+                whiteSpace: "nowrap",
               }}
             >
               <span
                 className="pm-pulse"
-                aria-hidden
                 style={{
-                  width: 6,
-                  height: 6,
+                  width: 8,
+                  height: 8,
                   borderRadius: "50%",
-                  background: "var(--signal)",
+                  background: "#22C55E",
+                  flexShrink: 0,
                 }}
+                aria-hidden
               />
               <span
                 style={{
                   fontFamily: "var(--font-mono)",
-                  fontSize: 12,
-                  color: "var(--signal)",
+                  fontSize: 11,
+                  color: "var(--ink-primary)",
+                  letterSpacing: "0.06em",
                 }}
               >
-                Open to Staff · Principal roles
+                AVAILABLE NOW · REMOTE ONLY
               </span>
-            </span>
+            </div>
 
-            <h1
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontStyle: "italic",
-                fontSize: "clamp(3rem, 8vw, 6rem)",
-                color: "var(--ink-primary)",
-                lineHeight: 1.05,
-                margin: "24px 0 16px",
-                fontWeight: 400,
-              }}
-            >
-              Amit Chakraborty
-            </h1>
-
+            {/* mem0 score chip */}
             <div
               style={{
+                position: "absolute",
+                top: 16,
+                right: -16,
+                background: "var(--signal-light)",
+                border: "1px solid var(--signal-border)",
+                borderRadius: "var(--r-sm)",
+                padding: "5px 10px",
                 fontFamily: "var(--font-mono)",
-                fontSize: 13,
-                color: "var(--ink-tertiary)",
-                letterSpacing: "0.05em",
-                marginBottom: 20,
+                fontSize: 10,
+                color: "var(--signal)",
               }}
             >
-              Principal Architect{" "}
-              <span style={{ color: "var(--signal)" }}>·</span> AI-Native{" "}
-              <span style={{ color: "var(--signal)" }}>·</span> React{" "}
-              <span style={{ color: "var(--signal)" }}>·</span> Next.js{" "}
-              <span style={{ color: "var(--signal)" }}>·</span> mem0
+              score: 0.99
             </div>
-
-            <p
-              style={{
-                fontSize: 18,
-                color: "var(--ink-secondary)",
-                maxWidth: 520,
-                margin: "0 auto 36px",
-                lineHeight: 1.5,
-              }}
-            >
-              8+ years. 18+ production apps. 21 engineers led. 50K+ peak DAU.
-            </p>
-
-            <div
-              style={{
-                display: "flex",
-                gap: 0,
-                justifyContent: "center",
-                marginBottom: 36,
-                flexWrap: "wrap",
-              }}
-            >
-              {stats.map((s, i) => (
-                <div
-                  key={s.l}
-                  style={{
-                    padding: "0 32px",
-                    borderLeft:
-                      i === 0 ? "none" : "1px solid var(--edge-default)",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontFamily: "var(--font-serif)",
-                      fontStyle: "italic",
-                      fontSize: 40,
-                      color: "var(--ink-primary)",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {s.v}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 11,
-                      color: "var(--ink-tertiary)",
-                      letterSpacing: "0.08em",
-                      marginTop: 8,
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {s.l}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                gap: 12,
-                justifyContent: "center",
-                flexWrap: "wrap",
-              }}
-            >
-              <a
-                href="#work"
-                style={{
-                  background: "var(--signal)",
-                  color: "white",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  padding: "12px 24px",
-                  borderRadius: "var(--r-md)",
-                  textDecoration: "none",
-                  transition: "all 0.25s var(--ease)",
-                  display: "inline-block",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = "var(--shadow-signal)";
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = "none";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
-              >
-                View My Work ↓
-              </a>
-              <a
-                href="mailto:amit@devamit.co.in"
-                style={{
-                  background: "transparent",
-                  border: "1px solid var(--edge-strong)",
-                  color: "var(--ink-secondary)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 13,
-                  padding: "12px 20px",
-                  borderRadius: "var(--r-md)",
-                  textDecoration: "none",
-                  transition: "all 0.25s var(--ease)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "var(--edge-signal)";
-                  e.currentTarget.style.color = "var(--signal)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "var(--edge-strong)";
-                  e.currentTarget.style.color = "var(--ink-secondary)";
-                }}
-              >
-                amit@devamit.co.in ↗
-              </a>
-            </div>
-
-            <div
-              style={{
-                marginTop: 64,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 6,
-                opacity: 0,
-                animation: "pm-fade-in 0.6s var(--ease) 1.5s forwards",
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 10,
-                  color: "var(--ink-tertiary)",
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
-                }}
-              >
-                scroll
-              </span>
-              <svg
-                className="pm-bounce"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <path
-                  d="M6 9l6 6 6-6"
-                  stroke="var(--ink-tertiary)"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-          </HeroStagger>
+          </div>
         </div>
-      )}
-      <style>{`@keyframes pm-fade-in { to { opacity: 1; } }`}</style>
+      </div>
+
+      {/* Scroll indicator */}
+      <div
+        ref={scrollRef}
+        style={{
+          position: "absolute",
+          bottom: 32,
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 6,
+          opacity: 0,
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 9,
+            color: "var(--ink-tertiary)",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+          }}
+        >
+          scroll
+        </span>
+        <svg
+          className="pm-bounce"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden
+        >
+          <path
+            d="M6 9l6 6 6-6"
+            stroke="var(--ink-tertiary)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
     </section>
   );
 }
@@ -655,8 +774,7 @@ function Philosophy() {
           fontWeight: 400,
         }}
       >
-        <span style={{ fontStyle: "italic" }}>How I think</span> about
-        building.
+        <span style={{ fontStyle: "italic" }}>How I think</span> about building.
       </h2>
       <div
         style={{
@@ -866,15 +984,7 @@ const CLUSTERS: Cluster[] = [
   },
 ];
 
-function SkillBar({
-  score,
-  color,
-  animate,
-}: {
-  score: number;
-  color: string;
-  animate: boolean;
-}) {
+function SkillBar({ score, color, animate }: { score: number; color: string; animate: boolean }) {
   return (
     <div
       style={{
@@ -901,11 +1011,7 @@ function SkillBar({
 function ClusterCard({ cluster }: { cluster: Cluster }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.2);
   return (
-    <div
-      ref={ref}
-      className="pm-card"
-      style={{ padding: 24, background: "var(--bg-surface)" }}
-    >
+    <div ref={ref} className="pm-card" style={{ padding: 24, background: "var(--bg-surface)" }}>
       <div
         style={{
           display: "inline-block",
@@ -931,9 +1037,7 @@ function ClusterCard({ cluster }: { cluster: Cluster }) {
                 gap: 8,
               }}
             >
-              <span style={{ fontSize: 13, color: "var(--ink-primary)" }}>
-                {s.name}
-              </span>
+              <span style={{ fontSize: 13, color: "var(--ink-primary)" }}>{s.name}</span>
               <span
                 style={{
                   fontFamily: "var(--font-mono)",
@@ -954,11 +1058,7 @@ function ClusterCard({ cluster }: { cluster: Cluster }) {
             >
               {s.note}
             </div>
-            <SkillBar
-              score={s.score}
-              color={cluster.color}
-              animate={inView}
-            />
+            <SkillBar score={s.score} color={cluster.color} animate={inView} />
           </div>
         ))}
       </div>
@@ -988,8 +1088,7 @@ function Skills() {
           maxWidth: 600,
         }}
       >
-        Proficiency mapped as retrieval scores. Higher = faster recall under
-        pressure.
+        Proficiency mapped as retrieval scores. Higher = faster recall under pressure.
       </p>
       <div
         style={{
@@ -1037,14 +1136,7 @@ const PROJECTS: Project[] = [
     year: "2025–2026",
     url: "https://aurastudio.devamit.co.in",
     impact: "45+ node types · Live LLM pipelines",
-    stack: [
-      "React 19",
-      "React Flow",
-      "Next.js",
-      "Gemini API",
-      "NestJS",
-      "Zustand",
-    ],
+    stack: ["React 19", "React Flow", "Next.js", "Gemini API", "NestJS", "Zustand"],
     description:
       "Nodal canvas where users drag, connect, and configure 45+ AI pipeline nodes in real time without glue code. Full streaming execution. Not a demo.",
     roleHighlights: [
@@ -1086,14 +1178,7 @@ const PROJECTS: Project[] = [
     year: "2024–2026",
     url: "https://harmonybloom.devamit.co.in",
     impact: "AES-256-GCM · Dexie offline-first · Gemini AI",
-    stack: [
-      "React 18",
-      "Vite",
-      "Supabase",
-      "Dexie",
-      "Framer Motion",
-      "Gemini API",
-    ],
+    stack: ["React 18", "Vite", "Supabase", "Dexie", "Framer Motion", "Gemini API"],
     description:
       "Privacy-first wellness engine. Zero-knowledge architecture. Runs inside Telegram. AI coach with gamified habit tracking.",
     roleHighlights: [
@@ -1156,13 +1241,7 @@ const PROJECTS: Project[] = [
     year: "2022–2024",
     url: "https://apps.apple.com/app/defi11-fantasy-sports-app/id1608967244",
     impact: "Ethereum Mainnet · UUPS proxy · NFT marketplace",
-    stack: [
-      "Solidity",
-      "React Native",
-      "Wagmi",
-      "Ethers.js",
-      "ERC-721",
-    ],
+    stack: ["Solidity", "React Native", "Wagmi", "Ethers.js", "ERC-721"],
     description:
       "100% on-chain. Smart contract prize pools. NFT marketplace with ERC-2981 royalties. Zero-trust — no centralized game logic.",
     roleHighlights: [
@@ -1177,13 +1256,7 @@ const PROJECTS: Project[] = [
 
 /* ─── Project Card ─────────────────────────────────────────────────────────── */
 
-function ProjectCard({
-  p,
-  onSelect,
-}: {
-  p: Project;
-  onSelect: (p: Project) => void;
-}) {
+function ProjectCard({ p, onSelect }: { p: Project; onSelect: (p: Project) => void }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.18);
   const visibleStack = p.stack.slice(0, 4);
   const overflow = p.stack.length - visibleStack.length;
@@ -1285,9 +1358,7 @@ function ProjectCard({
         >
           {p.name}
         </h3>
-        <div style={{ fontSize: 13, color: "var(--ink-secondary)" }}>
-          {p.tagline}
-        </div>
+        <div style={{ fontSize: 13, color: "var(--ink-secondary)" }}>{p.tagline}</div>
       </div>
 
       <p style={{ fontSize: 13, color: "var(--ink-secondary)", lineHeight: 1.5 }}>
@@ -1369,12 +1440,8 @@ function ProjectCard({
               cursor: "pointer",
               transition: "background 0.2s",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.background = `${p.signal}25`)
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.background = `${p.signal}15`)
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.background = `${p.signal}25`)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = `${p.signal}15`)}
           >
             View Details
           </button>
@@ -1395,26 +1462,26 @@ function ProjectCard({
 
 /* ─── Project Modal ────────────────────────────────────────────────────────── */
 
-function ProjectModal({
-  project,
-  onClose,
-}: {
-  project: Project;
-  onClose: () => void;
-}) {
+function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
   const p = project;
 
-  // Close on Escape
+  // Close on Escape + freeze Lenis while modal is open
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handler);
-    // Lock body scroll
-    document.body.style.overflow = "hidden";
+
+    // Freeze Lenis scroll while modal is open
+    import("@/hooks/use-smooth-scroll").then(({ getLenis }) => {
+      getLenis()?.stop();
+    });
+
     return () => {
       document.removeEventListener("keydown", handler);
-      document.body.style.overflow = "";
+      import("@/hooks/use-smooth-scroll").then(({ getLenis }) => {
+        getLenis()?.start();
+      });
     };
   }, [onClose]);
 
@@ -1486,9 +1553,7 @@ function ProjectModal({
           }}
         >
           <div>
-            <div
-              style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}
-            >
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
               <span
                 style={{
                   background: `${p.signal}1a`,
@@ -1522,9 +1587,7 @@ function ProjectModal({
             >
               {p.name}
             </h2>
-            <p style={{ fontSize: 14, color: "var(--ink-secondary)" }}>
-              {p.tagline}
-            </p>
+            <p style={{ fontSize: 14, color: "var(--ink-secondary)" }}>{p.tagline}</p>
           </div>
           <button
             type="button"
@@ -1624,12 +1687,8 @@ function ProjectModal({
               zIndex: 1,
               transition: "color 0.2s",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.color = p.signal)
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "var(--ink-tertiary)")
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.color = p.signal)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-tertiary)")}
           >
             [ live at {p.url.replace("https://", "")} ↗ ]
           </a>
@@ -1841,12 +1900,8 @@ function ProjectModal({
               textDecoration: "none",
               transition: "box-shadow 0.2s",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.boxShadow = "var(--shadow-signal)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.boxShadow = "none")
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "var(--shadow-signal)")}
+            onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
           >
             View Live ↗
           </a>
@@ -1937,18 +1992,10 @@ function syntaxHighlight(code: string) {
   return out;
 }
 
-function Demo({
-  visitorId,
-  showToast,
-}: {
-  visitorId: string;
-  showToast: (m: string) => void;
-}) {
+function Demo({ visitorId, showToast }: { visitorId: string; showToast: (m: string) => void }) {
   const [input, setInput] = useState("");
   const [memories, setMemories] = useState<MemoryResult[]>([]);
-  const [results, setResults] = useState<
-    (MemoryResult & { score: string })[] | null
-  >(null);
+  const [results, setResults] = useState<(MemoryResult & { score: string })[] | null>(null);
   const [loading, setLoading] = useState<"add" | "search" | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQ, setSearchQ] = useState("");
@@ -1964,19 +2011,17 @@ function Demo({
       `await mem0.add(\n  [{ role: "user", content: "${input.replace(/"/g, '\\"')}" }],\n  { user_id: "${visitorId}" }\n);`,
     );
     try {
-      const res = await addMemoryFn({
+      const res = (await addMemoryFn({
         data: {
           messages: [{ role: "user", content: input }],
           user_id: visitorId,
           metadata: { source: "portfolio_demo" },
         },
-      });
+      })) as { success: boolean; data?: MemoryResult; apiMode: "real" | "mock" };
       if (res.success && res.data) {
         setMemories((prev) => [res.data!, ...prev]);
         setApiMode(res.apiMode);
-        showToast(
-          res.apiMode === "real" ? "Memory stored via mem0 API" : "Memory stored (local)",
-        );
+        showToast(res.apiMode === "real" ? "Memory stored via mem0 API" : "Memory stored (local)");
       }
     } catch {
       // Fallback to mock client
@@ -1984,7 +2029,7 @@ function Demo({
         user_id: visitorId,
         metadata: { source: "portfolio_demo" },
       });
-      setMemories((prev) => [entry, ...prev]);
+      setMemories((prev) => [entry as unknown as MemoryResult, ...prev]);
       setApiMode("mock");
       showToast("Memory stored (local fallback)");
     }
@@ -1999,11 +2044,15 @@ function Demo({
       `await mem0.search(\n  "${searchQ.replace(/"/g, '\\"')}",\n  { user_id: "${visitorId}" }\n);`,
     );
     try {
-      const res = await searchMemoryFn({
+      const res = (await searchMemoryFn({
         data: { query: searchQ || "*", user_id: visitorId },
-      });
+      })) as {
+        success: boolean;
+        data?: (MemoryResult & { score: string })[];
+        apiMode: "real" | "mock";
+      };
       if (res.success && res.data) {
-        setResults(res.data as (MemoryResult & { score: string })[]);
+        setResults(res.data);
         setApiMode(res.apiMode);
       }
     } catch {
@@ -2016,24 +2065,18 @@ function Demo({
     setLoading(null);
   }, [searchQ, visitorId]);
 
-  const onDelete = useCallback(
-    async (id: string) => {
-      try {
-        await deleteMemoryFn({ data: { memory_id: id } });
-      } catch {
-        await mockMem0.delete(id);
-      }
-      setMemories((prev) => prev.filter((m) => m.id !== id));
-      setResults((prev) => (prev ? prev.filter((m) => m.id !== id) : null));
-      setCode(`await mem0.delete("${id}");`);
-    },
-    [],
-  );
+  const onDelete = useCallback(async (id: string) => {
+    try {
+      await deleteMemoryFn({ data: { memory_id: id } });
+    } catch {
+      await mockMem0.delete(id);
+    }
+    setMemories((prev) => prev.filter((m) => m.id !== id));
+    setResults((prev) => (prev ? prev.filter((m) => m.id !== id) : null));
+    setCode(`await mem0.delete("${id}");`);
+  }, []);
 
-  const matchedIds = useMemo(
-    () => new Set((results ?? []).map((r) => r.id)),
-    [results],
-  );
+  const matchedIds = useMemo(() => new Set((results ?? []).map((r) => r.id)), [results]);
   const scoreById = useMemo(() => {
     const map = new Map<string, string>();
     (results ?? []).forEach((r) => map.set(r.id, r.score));
@@ -2061,8 +2104,8 @@ function Demo({
           maxWidth: 640,
         }}
       >
-        This demo runs the real mem0 API surface. Add memories. Search them.
-        Watch the retrieval scores. This is what I would build for your users.
+        This demo runs the real mem0 API surface. Add memories. Search them. Watch the retrieval
+        scores. This is what I would build for your users.
       </p>
 
       <div
@@ -2099,8 +2142,7 @@ function Demo({
             {apiMode && (
               <span
                 style={{
-                  background:
-                    apiMode === "real" ? "rgba(22,160,124,0.1)" : "rgba(245,158,11,0.1)",
+                  background: apiMode === "real" ? "rgba(22,160,124,0.1)" : "rgba(245,158,11,0.1)",
                   color: apiMode === "real" ? "var(--signal)" : "#F59E0B",
                   border: `1px solid ${apiMode === "real" ? "rgba(22,160,124,0.25)" : "rgba(245,158,11,0.3)"}`,
                   fontFamily: "var(--font-mono)",
@@ -2300,9 +2342,7 @@ function Demo({
             }}
           >
             <div>
-              <div style={{ fontSize: 14, fontWeight: 600 }}>
-                Stored Memories
-              </div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>Stored Memories</div>
               <div
                 style={{
                   fontFamily: "var(--font-mono)",
@@ -2324,8 +2364,7 @@ function Demo({
                   borderRadius: "var(--r-full)",
                 }}
               >
-                {memories.length}{" "}
-                {memories.length === 1 ? "Memory" : "Memories"}
+                {memories.length} {memories.length === 1 ? "Memory" : "Memories"}
               </span>
               <span
                 aria-hidden
@@ -2368,27 +2407,15 @@ function Demo({
                 gap: 10,
               }}
             >
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden
-              >
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path
                   d="M12 2a4 4 0 00-4 4v1a4 4 0 00-2 7.5V17a3 3 0 003 3h6a3 3 0 003-3v-2.5A4 4 0 0016 7V6a4 4 0 00-4-4z"
                   stroke="var(--signal)"
                   strokeWidth="1.5"
                 />
               </svg>
-              <div
-                style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}
-              >
-                No memories yet.
-              </div>
-              <div
-                style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}
-              >
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>No memories yet.</div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>
                 Start typing to watch Mem0 extract and store context.
               </div>
             </div>
@@ -2491,12 +2518,9 @@ function Demo({
                             lineHeight: 1,
                             padding: 0,
                           }}
-                          onMouseEnter={(e) =>
-                            (e.currentTarget.style.color = "#DC2626")
-                          }
+                          onMouseEnter={(e) => (e.currentTarget.style.color = "#DC2626")}
                           onMouseLeave={(e) =>
-                            (e.currentTarget.style.color =
-                              "var(--ink-tertiary)")
+                            (e.currentTarget.style.color = "var(--ink-tertiary)")
                           }
                         >
                           ×
@@ -2624,15 +2648,9 @@ function Terminal({ log }: { log: TermLog }) {
           gap: 8,
         }}
       >
-        <span
-          style={{ width: 12, height: 12, borderRadius: "50%", background: "#FF5F57" }}
-        />
-        <span
-          style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEBC2E" }}
-        />
-        <span
-          style={{ width: 12, height: 12, borderRadius: "50%", background: "#28C840" }}
-        />
+        <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#FF5F57" }} />
+        <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEBC2E" }} />
+        <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#28C840" }} />
         <span
           style={{
             marginLeft: "auto",
@@ -2655,9 +2673,7 @@ function Terminal({ log }: { log: TermLog }) {
           overflowX: "auto",
         }}
       >
-        <div
-          style={{ color: "var(--signal)", fontSize: 11, marginBottom: 12 }}
-        >
+        <div style={{ color: "var(--signal)", fontSize: 11, marginBottom: 12 }}>
           {log.tool} · {log.date}
         </div>
         <div style={{ color: "#4B5563" }}>{log.prompt}</div>
@@ -2936,9 +2952,7 @@ await mem0.add([
       }}
     >
       <Section id="contact-inner">
-        <Label>
-          {"[ mem0.add({ user_id: 'mem0_team', content: 'Amit is available' }) ]"}
-        </Label>
+        <Label>{"[ mem0.add({ user_id: 'mem0_team', content: 'Amit is available' }) ]"}</Label>
         <h2
           style={{
             fontFamily: "var(--font-serif)",
@@ -2947,8 +2961,7 @@ await mem0.add([
             fontWeight: 400,
           }}
         >
-          <span style={{ fontStyle: "italic" }}>Let's build memory</span>{" "}
-          together.
+          <span style={{ fontStyle: "italic" }}>Let's build memory</span> together.
         </h2>
         <p
           style={{
@@ -2958,8 +2971,7 @@ await mem0.add([
             maxWidth: 640,
           }}
         >
-          I've studied the SDK. I've built the demo. I've shipped the logs.
-          Here's how to reach me.
+          I've studied the SDK. I've built the demo. I've shipped the logs. Here's how to reach me.
         </p>
 
         <div
@@ -3017,32 +3029,6 @@ await mem0.add([
             marginBottom: 40,
           }}
         >
-          <a
-            href="https://app.dover.com/apply/Recruitingbond/f73ca394-3c9a-4f82-a7e2-4d63a26a6081"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "inline-block",
-              background: "var(--signal)",
-              color: "white",
-              fontSize: 15,
-              fontWeight: 600,
-              padding: "14px 32px",
-              borderRadius: "var(--r-md)",
-              textDecoration: "none",
-              transition: "all 0.25s var(--ease)",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = "var(--shadow-signal)";
-              e.currentTarget.style.transform = "translateY(-2px)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = "none";
-              e.currentTarget.style.transform = "translateY(0)";
-            }}
-          >
-            Apply to Mem0 →
-          </a>
           <ResumeDownloadButton />
         </div>
 
@@ -3200,22 +3186,8 @@ export function Portfolio() {
 
       {/* Project Modal */}
       {selectedProject && (
-        <ProjectModal
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-        />
+        <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
       )}
-
-      <style>{`
-        @media (max-width: 720px) {
-          .hide-on-mobile { display: none !important; }
-          .show-on-mobile { display: flex !important; }
-          section { padding-top: 64px !important; padding-bottom: 64px !important; }
-        }
-        @media (min-width: 721px) {
-          .show-on-mobile { display: none !important; }
-        }
-      `}</style>
     </div>
   );
 }

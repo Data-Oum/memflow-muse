@@ -8,6 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { useSmoothScroll } from "@/hooks/use-smooth-scroll";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -78,17 +79,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Lovable App" },
-      { name: "description", content: "This application is a dynamic, AI-powered portfolio showcasing technical expertise and project experience." },
+      {
+        name: "description",
+        content:
+          "This application is a dynamic, AI-powered portfolio showcasing technical expertise and project experience.",
+      },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "This application is a dynamic, AI-powered portfolio showcasing technical expertise and project experience." },
+      {
+        property: "og:description",
+        content:
+          "This application is a dynamic, AI-powered portfolio showcasing technical expertise and project experience.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "This application is a dynamic, AI-powered portfolio showcasing technical expertise and project experience." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/31c7b4a5-c7a1-427a-9ba8-35fdd2a10ae3/id-preview-ec90e9c4--a82d34a5-4711-4ee3-9859-f10f2934ce76.lovable.app-1780135675659.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/31c7b4a5-c7a1-427a-9ba8-35fdd2a10ae3/id-preview-ec90e9c4--a82d34a5-4711-4ee3-9859-f10f2934ce76.lovable.app-1780135675659.png" },
+      {
+        name: "twitter:description",
+        content:
+          "This application is a dynamic, AI-powered portfolio showcasing technical expertise and project experience.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/31c7b4a5-c7a1-427a-9ba8-35fdd2a10ae3/id-preview-ec90e9c4--a82d34a5-4711-4ee3-9859-f10f2934ce76.lovable.app-1780135675659.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/31c7b4a5-c7a1-427a-9ba8-35fdd2a10ae3/id-preview-ec90e9c4--a82d34a5-4711-4ee3-9859-f10f2934ce76.lovable.app-1780135675659.png",
+      },
     ],
     links: [
       {
@@ -121,6 +142,9 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  // Lenis smooth scroll (initialised once at root — all pages benefit)
+  useSmoothScroll();
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {

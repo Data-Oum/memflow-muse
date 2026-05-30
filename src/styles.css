@@ -1,23 +1,11 @@
+/* Google Fonts MUST be first — PostCSS requires @import before all other rules */
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
-@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
 @custom-variant dark (&:is(.dark *));
-
-/*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -67,39 +55,40 @@
   --background: oklch(0.984 0.003 247.858);
   --foreground: oklch(0.16 0.02 264);
 
-  /* Light Memory tokens */
-  --bg-page: #F7F8FA;
+  /* ── Light Memory design tokens ─────────────────────── */
+  --bg-page:    #F7F8FA;
   --bg-surface: #FFFFFF;
-  --bg-raised: #F0F2F5;
+  --bg-raised:  #F0F2F5;
   --bg-overlay: #EAECF0;
 
-  --signal: #16A07C;
-  --signal-light: #E6F7F2;
+  --signal:        #16A07C;
+  --signal-light:  #E6F7F2;
   --signal-border: rgba(22,160,124,0.25);
-  --signal-glow: 0 0 0 3px rgba(22,160,124,0.12);
+  --signal-glow:   0 0 0 3px rgba(22,160,124,0.12);
 
-  --ink-primary: #0D0F12;
+  --ink-primary:   #0D0F12;
   --ink-secondary: #4B5563;
-  --ink-tertiary: #9CA3AF;
+  --ink-tertiary:  #9CA3AF;
 
-  --edge-subtle: rgba(0,0,0,0.06);
+  --edge-subtle:  rgba(0,0,0,0.06);
   --edge-default: rgba(0,0,0,0.10);
-  --edge-strong: rgba(0,0,0,0.16);
-  --edge-signal: rgba(22,160,124,0.25);
+  --edge-strong:  rgba(0,0,0,0.16);
+  --edge-signal:  rgba(22,160,124,0.25);
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-sm:     0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:     0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:     0 12px 40px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.05);
   --shadow-signal: 0 4px 24px rgba(22,160,124,0.18);
 
   --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-full: 9999px;
 
   --font-serif: 'Instrument Serif', Georgia, serif;
-  --font-sans: 'Geist', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans:  'Geist', system-ui, -apple-system, sans-serif;
+  --font-mono:  'JetBrains Mono', ui-monospace, monospace;
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
+  /* ── shadcn/ui tokens ─────────────────────────────── */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
@@ -168,8 +157,10 @@
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
+  * { border-color: var(--color-border); }
+
+  html {
+    scroll-behavior: auto; /* Lenis handles smooth scrolling */
   }
 
   body {
@@ -178,9 +169,8 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
   }
-
-  html { scroll-behavior: smooth; }
 
   ::selection { background: var(--signal-light); color: var(--signal); }
 
@@ -189,12 +179,29 @@
     outline-offset: 2px;
     border-radius: 4px;
   }
+
+  /* Lenis smooth scroll */
+  html.lenis, html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+  .lenis.lenis-scrolling iframe {
+    pointer-events: none;
+  }
 }
 
-/* Portfolio utilities */
+/* ── Portfolio utilities ─────────────────────────────── */
 .font-serif { font-family: var(--font-serif); }
-.font-sans { font-family: var(--font-sans); }
-.font-mono { font-family: var(--font-mono); }
+.font-sans  { font-family: var(--font-sans); }
+.font-mono  { font-family: var(--font-mono); }
 
 .section-label {
   font-family: var(--font-mono);
@@ -205,34 +212,81 @@
   margin-bottom: 16px;
 }
 
-.fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.65s var(--ease), transform 0.65s var(--ease); }
-.fade-up.in { opacity: 1; transform: translateY(0); }
+/* ── GSAP-powered section reveals (replaces CSS fade-up) ─ */
+.reveal-section {
+  will-change: opacity, transform;
+}
 
+/* Fallback for no-JS / before GSAP initialises */
+.reveal-section.gsap-ready {
+  opacity: 0;
+  transform: translateY(32px);
+}
+
+/* ── Card hover baseline ─────────────────────────────── */
+.pm-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--edge-default);
+  border-radius: var(--r-lg);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.pm-card:hover {
+  border-color: var(--edge-signal);
+  box-shadow: var(--shadow-signal);
+  transform: translateY(-3px);
+}
+
+/* ── Animations ──────────────────────────────────────── */
 @keyframes pm-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.25); }
+  50%       { opacity: 0.6; transform: scale(1.25); }
 }
 .pm-pulse { animation: pm-pulse 2s ease-in-out infinite; }
 
 @keyframes pm-bounce-y {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(6px); }
+  50%       { transform: translateY(6px); }
 }
 .pm-bounce { animation: pm-bounce-y 1.8s ease-in-out infinite; }
 
 @keyframes pm-slide-in-right {
   from { transform: translateX(40px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(0);    opacity: 1; }
 }
 .pm-slide-in { animation: pm-slide-in-right 0.35s var(--ease); }
 
 @keyframes pm-slide-down {
   from { transform: translateY(-100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(0);     opacity: 1; }
 }
 .pm-slide-down { animation: pm-slide-down 0.45s var(--ease); }
 
+@keyframes pm-fade-in { to { opacity: 1; } }
+
+@keyframes pm-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.pm-cursor { animation: pm-cursor-blink 0.9s step-start infinite; }
+
+/* ── Responsive helpers ─────────────────────────────── */
+@media (max-width: 720px) {
+  .hide-on-mobile  { display: none !important; }
+  .show-on-mobile  { display: flex !important; }
+  .section-mobile-pad {
+    padding-top: 64px !important;
+    padding-bottom: 64px !important;
+  }
+}
+@media (min-width: 721px) {
+  .show-on-mobile { display: none !important; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

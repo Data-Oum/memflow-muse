@@ -12,4 +12,13 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    // mem0ai is a Node.js-only SDK — keep it out of the client bundle
+    ssr: {
+      external: ["mem0ai"],
+    },
+    optimizeDeps: {
+      exclude: ["mem0ai"],
+    },
+  },
 });

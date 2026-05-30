@@ -3,11 +3,15 @@ import { z } from "zod";
 
 // ─── Shared types ─────────────────────────────────────────────────────────────
 
+/** JSON-serializable scalar — required by TanStack Start's serialization validator */
+type JsonScalar = string | number | boolean | null;
+export type JsonMetadata = Record<string, JsonScalar | JsonScalar[] | Record<string, JsonScalar>>;
+
 export interface MemoryResult {
   id: string;
   memory: string;
   user_id: string;
-  metadata: Record<string, unknown>;
+  metadata: JsonMetadata;
   created_at: string;
   category: string;
 }
@@ -20,7 +24,7 @@ export interface MemoryResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
-  /** true when running against the real mem0 API, false = local mock fallback */
+  /** "real" when using the mem0 API key, "mock" = in-process fallback */
   apiMode: "real" | "mock";
 }
 
@@ -29,10 +33,7 @@ export interface MemoryResponse<T> {
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // Shared in-memory store for the mock — survives across requests in dev (single process)
-const mockStore = new Map<
-  string,
-  MemoryResult
->();
+const mockStore = new Map<string, MemoryResult>();
 
 function extractMemory(content: string): string {
   const c = content.trim().replace(/\s+/g, " ");
@@ -68,54 +69,56 @@ function detectCategory(content: string): string {
 
 // ─── Real mem0 API helpers ────────────────────────────────────────────────────
 
+async function getMemoryClient() {
+  // Dynamic ESM import — runs server-side only, excluded from client bundle
+  const mod = await import("mem0ai");
+  const MemoryClient = (mod as { default?: unknown }).default ?? mod;
+  return new (MemoryClient as new (opts: {
+    apiKey: string;
+  }) => Record<string, (...args: unknown[]) => Promise<unknown>>)({
+    apiKey: process.env.MEM0_API_KEY!,
+  });
+}
+
 async function callRealAdd(
   messages: Array<{ role: string; content: string }>,
   userId: string,
   metadata: Record<string, unknown>,
 ): Promise<MemoryResult> {
-  // Dynamic import — only resolves on server, tree-shaken from client bundle
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const MemoryClient = require("mem0ai").default ?? require("mem0ai");
-  const client = new MemoryClient({ apiKey: process.env.MEM0_API_KEY });
+  const client = await getMemoryClient();
   const res = await client.add(messages, { user_id: userId, metadata });
   // Normalise response shape across mem0 SDK versions
-  const raw = Array.isArray(res) ? res[0] : res;
+  const raw = (Array.isArray(res) ? res[0] : res) as Record<string, unknown>;
   return {
-    id: raw.id ?? raw.memory_id ?? `mem_${Date.now()}`,
-    memory: raw.memory ?? raw.data ?? messages[messages.length - 1]?.content ?? "",
+    id: String(raw.id ?? raw.memory_id ?? `mem_${Date.now()}`),
+    memory: String(raw.memory ?? raw.data ?? messages[messages.length - 1]?.content ?? ""),
     user_id: userId,
-    metadata,
-    created_at: raw.created_at ?? new Date().toISOString(),
-    category: raw.categories?.[0] ?? detectCategory(messages[messages.length - 1]?.content ?? ""),
+    metadata: metadata as JsonMetadata,
+    created_at: String(raw.created_at ?? new Date().toISOString()),
+    category: String(
+      (raw.categories as string[] | undefined)?.[0] ??
+        detectCategory(messages[messages.length - 1]?.content ?? ""),
+    ),
   };
 }
 
-async function callRealSearch(
-  query: string,
-  userId: string,
-): Promise<MemorySearchResult[]> {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const MemoryClient = require("mem0ai").default ?? require("mem0ai");
-  const client = new MemoryClient({ apiKey: process.env.MEM0_API_KEY });
+async function callRealSearch(query: string, userId: string): Promise<MemorySearchResult[]> {
+  const client = await getMemoryClient();
   const res = await client.search(query, { user_id: userId });
-  const hits = Array.isArray(res) ? res : res.results ?? [];
-  return hits.map((r: Record<string, unknown>) => ({
+  const hits = Array.isArray(res) ? res : ((res as Record<string, unknown>).results ?? []);
+  return (hits as Record<string, unknown>[]).map((r) => ({
     id: String(r.id ?? r.memory_id ?? `mem_${Math.random().toString(36).slice(2)}`),
     memory: String(r.memory ?? r.data ?? ""),
     user_id: userId,
-    metadata: (r.metadata as Record<string, unknown>) ?? {},
+    metadata: (r.metadata ?? {}) as JsonMetadata,
     created_at: String(r.created_at ?? new Date().toISOString()),
-    category: String(
-      (r.categories as string[] | undefined)?.[0] ?? r.category ?? "general",
-    ),
+    category: String((r.categories as string[] | undefined)?.[0] ?? r.category ?? "general"),
     score: String(r.score ?? (0.75 + Math.random() * 0.24).toFixed(2)),
   }));
 }
 
 async function callRealDelete(memoryId: string): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const MemoryClient = require("mem0ai").default ?? require("mem0ai");
-  const client = new MemoryClient({ apiKey: process.env.MEM0_API_KEY });
+  const client = await getMemoryClient();
   await client.delete(memoryId);
 }
 
@@ -126,19 +129,15 @@ export const addMemoryFn = createServerFn({ method: "POST" })
     z.object({
       messages: z.array(z.object({ role: z.string(), content: z.string() })).min(1),
       user_id: z.string().min(1),
-      metadata: z.record(z.unknown()).optional(),
+      metadata: z.record(z.union([z.string(), z.number(), z.boolean(), z.null()])).optional(),
     }),
   )
-  .handler(async ({ data }): Promise<MemoryResponse<MemoryResult>> => {
+  .handler(async ({ data }) => {
     const hasApiKey = Boolean(process.env.MEM0_API_KEY);
 
     if (hasApiKey) {
       try {
-        const result = await callRealAdd(
-          data.messages,
-          data.user_id,
-          data.metadata ?? {},
-        );
+        const result = await callRealAdd(data.messages, data.user_id, data.metadata ?? {});
         return { success: true, data: result, apiMode: "real" };
       } catch (err) {
         console.error("[mem0 add] real API error:", err);
@@ -153,7 +152,7 @@ export const addMemoryFn = createServerFn({ method: "POST" })
       id: "mem_" + Math.random().toString(36).slice(2, 10),
       memory: extractMemory(content),
       user_id: data.user_id,
-      metadata: data.metadata ?? {},
+      metadata: (data.metadata ?? {}) as JsonMetadata,
       created_at: new Date().toISOString(),
       category: detectCategory(content),
     };
@@ -182,9 +181,7 @@ export const searchMemoryFn = createServerFn({ method: "POST" })
 
     // Mock fallback
     await delay(250 + Math.random() * 300);
-    const all = [...mockStore.values()].filter(
-      (m) => m.user_id === data.user_id,
-    );
+    const all = [...mockStore.values()].filter((m) => m.user_id === data.user_id);
     const results: MemorySearchResult[] = all
       .map((m) => ({
         ...m,
