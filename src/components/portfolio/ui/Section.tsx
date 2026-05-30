@@ -1,7 +1,6 @@
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useGsapReveal } from "@/hooks/use-gsap-reveal";
 
-/** Section wrapper: GSAP scroll-reveal, consistent padding, centred max-width. */
 export function Section({
   id,
   children,
@@ -27,9 +26,4 @@ export function Section({
       <div style={{ maxWidth: 1080, margin: "0 auto" }}>{children}</div>
     </section>
   );
-}
-
-/** Mono-spaced section label — e.g. [ memory.search({ category: 'work' }) ] */
-export function SectionLabel({ children }: { children: string }) {
-  return <span className="section-label">{children}</span>;
 }

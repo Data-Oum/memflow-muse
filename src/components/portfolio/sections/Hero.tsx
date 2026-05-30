@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { ChevronDown } from "lucide-react";
 
 const PORTRAIT_URL = "https://devamit.co.in/amit-portrait.jpg";
 
@@ -16,15 +17,59 @@ export function Hero() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    import("gsap").then(({ gsap }) => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      tl.fromTo(imageRef.current, { opacity: 0, x: 48, scale: 0.94 }, { opacity: 1, x: 0, scale: 1, duration: 0.9 });
-      const items = textRef.current?.querySelectorAll(".h-item");
-      if (items?.length) {
-        tl.fromTo(items, { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.65, stagger: 0.08 }, "-=0.6");
-      }
-      tl.fromTo(scrollRef.current, { opacity: 0 }, { opacity: 1, duration: 0.5 }, "-=0.2");
-    });
+
+    import("gsap")
+      .then(({ gsap }) => {
+        const items = textRef.current?.querySelectorAll(".h-item");
+
+        // CRITICAL: Hide elements via gsap.set BEFORE animating.
+        // Elements are visible by default in JSX — so if GSAP never loads,
+        // the hero still renders content instead of a blank page.
+        if (items?.length) {
+          gsap.set(items, { opacity: 0, y: 22 });
+        }
+        if (imageRef.current) {
+          gsap.set(imageRef.current, { opacity: 0, x: 48, scale: 0.94 });
+        }
+        if (scrollRef.current) {
+          gsap.set(scrollRef.current, { opacity: 0 });
+        }
+
+        const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+        // Portrait slides in from right
+        tl.fromTo(
+          imageRef.current,
+          { opacity: 0, x: 48, scale: 0.94 },
+          { opacity: 1, x: 0, scale: 1, duration: 0.9 },
+        );
+
+        // Text items stagger up
+        if (items?.length) {
+          tl.fromTo(
+            items,
+            { opacity: 0, y: 22 },
+            { opacity: 1, y: 0, duration: 0.65, stagger: 0.08 },
+            "-=0.6",
+          );
+        }
+
+        // Scroll indicator fades in last
+        tl.fromTo(
+          scrollRef.current,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.5 },
+          "-=0.2",
+        );
+      })
+      .catch(() => {
+        // GSAP failed to load — ensure everything is visible
+        textRef.current?.querySelectorAll(".h-item").forEach((item) => {
+          (item as HTMLElement).style.opacity = "1";
+        });
+        if (imageRef.current) imageRef.current.style.opacity = "1";
+        if (scrollRef.current) scrollRef.current.style.opacity = "1";
+      });
   }, []);
 
   return (
@@ -77,13 +122,17 @@ export function Hero() {
               borderRadius: "var(--r-full)",
               padding: "5px 14px 5px 10px",
               marginBottom: 28,
-              opacity: 0,
             }}
           >
             <span
               className="pm-pulse"
               aria-hidden
-              style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--signal)" }}
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: "50%",
+                background: "var(--signal)",
+              }}
             />
             <span
               style={{
@@ -108,7 +157,6 @@ export function Hero() {
               lineHeight: 1.02,
               fontWeight: 400,
               marginBottom: 16,
-              opacity: 0,
             }}
           >
             Amit
@@ -125,12 +173,12 @@ export function Hero() {
               color: "var(--ink-tertiary)",
               letterSpacing: "0.05em",
               marginBottom: 24,
-              opacity: 0,
             }}
           >
-            Principal Architect <span style={{ color: "var(--signal)" }}>·</span> AI-Native{" "}
-            <span style={{ color: "var(--signal)" }}>·</span> React{" "}
-            <span style={{ color: "var(--signal)" }}>·</span> mem0
+            Principal Architect{" "}
+            <span style={{ color: "var(--signal)" }}>&middot;</span> AI-Native{" "}
+            <span style={{ color: "var(--signal)" }}>&middot;</span> React{" "}
+            <span style={{ color: "var(--signal)" }}>&middot;</span> mem0
           </div>
 
           {/* Tagline */}
@@ -142,24 +190,29 @@ export function Hero() {
               lineHeight: 1.65,
               marginBottom: 32,
               maxWidth: 460,
-              opacity: 0,
             }}
           >
-            8+ years building production-grade AI, mobile, and web systems. Founding Engineer. 21
-            engineers led.
+            8+ years building production-grade AI, mobile, and web systems.
+            Founding Engineer. 21 engineers led.
           </p>
 
           {/* Stats */}
           <div
             className="h-item"
-            style={{ display: "flex", gap: 0, marginBottom: 36, flexWrap: "wrap", opacity: 0 }}
+            style={{
+              display: "flex",
+              gap: 0,
+              marginBottom: 36,
+              flexWrap: "wrap",
+            }}
           >
             {STATS.map((s, i) => (
               <div
                 key={s.l}
                 style={{
                   padding: "0 24px",
-                  borderLeft: i === 0 ? "none" : "1px solid var(--edge-default)",
+                  borderLeft:
+                    i === 0 ? "none" : "1px solid var(--edge-default)",
                 }}
               >
                 <div
@@ -192,7 +245,12 @@ export function Hero() {
           {/* CTAs */}
           <div
             className="h-item"
-            style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 36, opacity: 0 }}
+            style={{
+              display: "flex",
+              gap: 12,
+              flexWrap: "wrap",
+              marginBottom: 36,
+            }}
           >
             <a
               href="#work"
@@ -204,7 +262,8 @@ export function Hero() {
                 padding: "12px 28px",
                 borderRadius: "var(--r-md)",
                 textDecoration: "none",
-                transition: "box-shadow 0.25s var(--ease), transform 0.25s var(--ease)",
+                transition:
+                  "box-shadow 0.25s var(--ease), transform 0.25s var(--ease)",
                 display: "inline-block",
               }}
               onMouseEnter={(e) => {
@@ -216,7 +275,7 @@ export function Hero() {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
-              View My Work ↓
+              View My Work
             </a>
             <a
               href="mailto:amit@devamit.co.in"
@@ -240,7 +299,7 @@ export function Hero() {
                 e.currentTarget.style.color = "var(--ink-secondary)";
               }}
             >
-              amit@devamit.co.in ↗
+              amit@devamit.co.in
             </a>
           </div>
 
@@ -254,7 +313,6 @@ export function Hero() {
               background: "#1A1D23",
               borderRadius: "var(--r-sm)",
               padding: "7px 14px",
-              opacity: 0,
             }}
           >
             <span
@@ -267,25 +325,39 @@ export function Hero() {
               }}
               aria-hidden
             />
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#9CA3AF" }}>
+            <span
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                color: "#9CA3AF",
+              }}
+            >
               <span style={{ color: "#16A07C" }}>mem0</span>
               <span style={{ color: "#8B5CF6" }}>.add</span>
               <span style={{ color: "#9CA3AF" }}>(</span>
-              <span style={{ color: "#FB923C" }}>"amit is available now"</span>
+              <span style={{ color: "#FB923C" }}>
+                &quot;amit is available now&quot;
+              </span>
               <span style={{ color: "#9CA3AF" }}>)</span>
             </span>
           </div>
         </div>
 
         {/* Right: portrait */}
-        <div ref={imageRef} style={{ opacity: 0 }} className="hide-on-mobile">
-          <div style={{ position: "relative", width: "clamp(260px, 26vw, 360px)" }}>
+        <div ref={imageRef} className="hide-on-mobile">
+          <div
+            style={{
+              position: "relative",
+              width: "clamp(260px, 26vw, 360px)",
+            }}
+          >
             {/* Photo card */}
             <div
               style={{
                 borderRadius: 24,
                 overflow: "hidden",
-                boxShadow: "0 24px 64px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06)",
+                boxShadow:
+                  "0 24px 64px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06)",
                 border: "1px solid var(--edge-default)",
                 aspectRatio: "4/5",
                 background: "var(--bg-raised)",
@@ -296,7 +368,13 @@ export function Hero() {
                 alt="Amit Chakraborty — Principal Architect"
                 width={360}
                 height={450}
-                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center top",
+                  display: "block",
+                }}
                 loading="eager"
                 decoding="async"
               />
@@ -322,7 +400,13 @@ export function Hero() {
             >
               <span
                 className="pm-pulse"
-                style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E", flexShrink: 0 }}
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  background: "#22C55E",
+                  flexShrink: 0,
+                }}
                 aria-hidden
               />
               <span
@@ -370,7 +454,6 @@ export function Hero() {
           flexDirection: "column",
           alignItems: "center",
           gap: 6,
-          opacity: 0,
         }}
       >
         <span
@@ -384,22 +467,12 @@ export function Hero() {
         >
           scroll
         </span>
-        <svg
+        <ChevronDown
           className="pm-bounce"
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
           aria-hidden
-        >
-          <path
-            d="M6 9l6 6 6-6"
-            stroke="var(--ink-tertiary)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+          size={14}
+          color="var(--ink-tertiary)"
+        />
       </div>
     </section>
   );

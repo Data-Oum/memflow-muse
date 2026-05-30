@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Menu, X } from "lucide-react";
 import { useScrollSpy } from "@/hooks/use-scroll-spy";
 
 const NAV_LINKS = [
@@ -47,15 +48,27 @@ export function Nav() {
           <a
             href="#hero"
             className="font-mono"
-            style={{ fontSize: 13, color: "var(--ink-primary)", textDecoration: "none", transition: "color 0.2s" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--signal)")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-primary)")}
+            style={{
+              fontSize: 13,
+              color: "var(--ink-primary)",
+              textDecoration: "none",
+              transition: "color 0.2s",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.color = "var(--signal)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.color = "var(--ink-primary)")
+            }
           >
             amit.co
           </a>
 
           {/* Desktop links */}
-          <div style={{ display: "flex", gap: 24, alignItems: "center" }} className="hide-on-mobile">
+          <div
+            style={{ display: "flex", gap: 24, alignItems: "center" }}
+            className="hide-on-mobile"
+          >
             {NAV_LINKS.map((n) => {
               const isActive = active === n.id;
               return (
@@ -66,7 +79,9 @@ export function Nav() {
                     fontFamily: "var(--font-sans)",
                     fontSize: 14,
                     position: "relative",
-                    color: isActive ? "var(--signal)" : "var(--ink-secondary)",
+                    color: isActive
+                      ? "var(--signal)"
+                      : "var(--ink-secondary)",
                     fontWeight: isActive ? 500 : 400,
                     textDecoration: "none",
                     transition: "color 0.2s",
@@ -108,10 +123,16 @@ export function Nav() {
                 textDecoration: "none",
                 transition: "background 0.2s",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(22,160,124,0.15)")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "var(--signal-light)")}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background =
+                  "rgba(22,160,124,0.15)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background =
+                  "var(--signal-light)")
+              }
             >
-              Open to roles →
+              Open to roles &rarr;
             </a>
 
             {/* Hamburger — mobile only */}
@@ -133,11 +154,7 @@ export function Nav() {
                 color: "var(--ink-secondary)",
               }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
+              <Menu aria-hidden size={16} />
             </button>
           </div>
         </nav>
@@ -168,12 +185,16 @@ export function Nav() {
               right: 20,
               background: "transparent",
               border: "none",
-              fontSize: 24,
+              width: 36,
+              height: 36,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               cursor: "pointer",
               color: "var(--ink-secondary)",
             }}
           >
-            ×
+            <X aria-hidden size={20} />
           </button>
           {NAV_LINKS.map((n) => (
             <a

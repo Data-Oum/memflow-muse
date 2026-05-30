@@ -78,37 +78,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
+      { title: "Amit Chakraborty — Principal Frontend Engineer" },
       {
         name: "description",
         content:
-          "This application is a dynamic, AI-powered portfolio showcasing technical expertise and project experience.",
+          "Production portfolio for Amit Chakraborty, Principal Architect and AI-native frontend engineer.",
       },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
+      { name: "author", content: "Amit Chakraborty" },
+      { property: "og:title", content: "Amit Chakraborty — Principal Frontend Engineer" },
       {
         property: "og:description",
         content:
-          "This application is a dynamic, AI-powered portfolio showcasing technical expertise and project experience.",
+          "Production portfolio with live mem0 memory API demo, shipped systems, and AI workflow evidence.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@devamitch" },
+      { name: "twitter:title", content: "Amit Chakraborty — Principal Frontend Engineer" },
       {
         name: "twitter:description",
         content:
-          "This application is a dynamic, AI-powered portfolio showcasing technical expertise and project experience.",
+          "Production portfolio with live mem0 memory API demo, shipped systems, and AI workflow evidence.",
       },
       {
         property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/31c7b4a5-c7a1-427a-9ba8-35fdd2a10ae3/id-preview-ec90e9c4--a82d34a5-4711-4ee3-9859-f10f2934ce76.lovable.app-1780135675659.png",
+        content: "https://devamit.co.in/amit-portrait.jpg",
       },
       {
         name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/31c7b4a5-c7a1-427a-9ba8-35fdd2a10ae3/id-preview-ec90e9c4--a82d34a5-4711-4ee3-9859-f10f2934ce76.lovable.app-1780135675659.png",
+        content: "https://devamit.co.in/amit-portrait.jpg",
       },
     ],
     links: [

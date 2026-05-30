@@ -44,13 +44,3 @@ export const LOGS: TermLog[] = [
 > Bugs caught before production: 3 edge cases in concurrent deletes`,
   },
 ];
-
-export const CONTRIBUTION_CODE = `// What Amit ships from day one
-await mem0.add([
-  { role: "engineer", content: "Polished production UIs, end-to-end" },
-  { role: "engineer", content: "AI-native workflow — Claude Code, Cursor, Windsurf" },
-  { role: "engineer", content: "mem0 SDK integrated before the first interview" },
-  { role: "engineer", content: "8 years of shipped systems. No unfinished work." }
-], { user_id: "mem0_team", metadata: { status: "open_to_hire" } });
-
-// { id: "mem_amit_001", score: 0.99, category: "hire_now" }`;

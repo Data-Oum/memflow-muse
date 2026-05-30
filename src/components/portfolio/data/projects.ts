@@ -11,7 +11,6 @@ export interface Project {
   stack: string[];
   description: string;
   roleHighlights: string[];
-  /** mem0-specific insight shown in the detail modal */
   whyItMatters: string;
 }
 
@@ -77,7 +76,7 @@ export const PROJECTS: Project[] = [
       "Designed Gemini AI coach with long-term memory injection for continuity across sessions",
     ],
     whyItMatters:
-      "This app is the mem0 thesis in consumer form: an AI that remembers you privately, persistently, and meaningfully. The Aura coach uses contextual memory injection — exactly the pattern mem0 enables at the SDK level.",
+      "This app is the mem0 thesis in consumer form: an AI that remembers you privately, persistently, and meaningfully. The Aura coach uses contextual memory injection — exactly the pattern mem0 enables at the SDK level. Built before I'd seen mem0's architecture. Converged naturally.",
   },
   {
     id: "mem_004",
@@ -140,6 +139,6 @@ export const PROJECTS: Project[] = [
       "Zero centralized game logic — all state lives on-chain, verifiable by anyone",
     ],
     whyItMatters:
-      "Blockchain is the most extreme form of persistent, verifiable memory. Every transaction is immutable context. Building DeFi systems taught me that the most valuable memory is the one that cannot be falsified.",
+      "Blockchain is the most extreme form of persistent, verifiable memory. Every transaction, every ownership change is immutable context. Building DeFi systems taught me that the most valuable memory is the one that cannot be falsified.",
   },
 ];

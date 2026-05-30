@@ -7,20 +7,25 @@
    • API calls (/api/*): Network-only, never cached
 ───────────────────────────────────────────────────────────────────────────── */
 
-const CACHE_VERSION = "amit-portfolio-v1";
+const CACHE_VERSION = "amit-portfolio-v2";
+const SHELL_CACHE = `${CACHE_VERSION}-shell`;
+const ASSET_CACHE = `${CACHE_VERSION}-assets`;
+const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 const STATIC_SHELL = [
   "/",
   "/offline.html",
   "/manifest.webmanifest",
   "/icon-192.png",
   "/icon-512.png",
+  "/resume.txt",
+  "/Amit%20Chakraborty.pdf",
 ];
 
 // ── Install: pre-cache the app shell ─────────────────────────────────────────
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
-      .open(CACHE_VERSION)
+      .open(SHELL_CACHE)
       .then((cache) => cache.addAll(STATIC_SHELL))
       .then(() => self.skipWaiting()),
   );
@@ -34,7 +39,7 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key !== CACHE_VERSION)
+            .filter((key) => !key.startsWith(CACHE_VERSION))
             .map((key) => caches.delete(key)),
         ),
       )
@@ -55,9 +60,9 @@ self.addEventListener("fetch", (event) => {
   // 2. Non-GET requests — pass through
   if (request.method !== "GET") return;
 
-  // 3. Cross-origin requests (CDN fonts, etc.) — cache-first
+  // 3. Cross-origin requests (fonts, portrait, screenshots) — stale while revalidate
   if (url.origin !== self.location.origin) {
-    event.respondWith(cacheFirst(request));
+    event.respondWith(staleWhileRevalidate(request, IMAGE_CACHE));
     return;
   }
 
@@ -67,19 +72,25 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 5. Everything else (JS, CSS, images) — cache-first
-  event.respondWith(cacheFirst(request));
+  // 5. Images and static documents — stale while revalidate
+  if (request.destination === "image" || url.pathname.endsWith(".pdf") || url.pathname.endsWith(".txt")) {
+    event.respondWith(staleWhileRevalidate(request, IMAGE_CACHE));
+    return;
+  }
+
+  // 6. Build assets — cache-first for speed
+  event.respondWith(cacheFirst(request, ASSET_CACHE));
 });
 
 // ── Strategies ────────────────────────────────────────────────────────────────
 
-async function cacheFirst(request) {
+async function cacheFirst(request, cacheName = ASSET_CACHE) {
   const cached = await caches.match(request);
   if (cached) return cached;
   try {
     const response = await fetch(request);
     if (response.ok) {
-      const cache = await caches.open(CACHE_VERSION);
+      const cache = await caches.open(cacheName);
       cache.put(request, response.clone());
     }
     return response;
@@ -92,7 +103,7 @@ async function networkFirstWithOfflineFallback(request) {
   try {
     const response = await fetch(request);
     if (response.ok) {
-      const cache = await caches.open(CACHE_VERSION);
+      const cache = await caches.open(SHELL_CACHE);
       cache.put(request, response.clone());
     }
     return response;
@@ -107,4 +118,16 @@ async function networkFirstWithOfflineFallback(request) {
     const offline = await caches.match("/offline.html");
     return offline ?? new Response("You are offline.", { status: 503 });
   }
+}
+
+async function staleWhileRevalidate(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+  const network = fetch(request)
+    .then((response) => {
+      if (response.ok) cache.put(request, response.clone());
+      return response;
+    })
+    .catch(() => cached);
+  return cached ?? network ?? new Response("Offline resource unavailable.", { status: 503 });
 }

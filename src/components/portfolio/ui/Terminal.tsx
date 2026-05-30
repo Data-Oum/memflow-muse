@@ -1,14 +1,6 @@
-import { type ReactNode } from "react";
+import type { TermLog } from "../data/logs";
 
-interface TerminalProps {
-  filename: string;
-  tool?: string;
-  date?: string;
-  children: ReactNode;
-}
-
-/** Dark terminal panel used in Logs and Contact sections. */
-export function Terminal({ filename, tool, date, children }: TerminalProps) {
+export function Terminal({ log }: { log: TermLog }) {
   return (
     <div
       style={{
@@ -18,7 +10,6 @@ export function Terminal({ filename, tool, date, children }: TerminalProps) {
         boxShadow: "var(--shadow-md)",
       }}
     >
-      {/* Title bar */}
       <div
         style={{
           background: "#14161C",
@@ -28,9 +19,18 @@ export function Terminal({ filename, tool, date, children }: TerminalProps) {
           gap: 8,
         }}
       >
-        <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#FF5F57" }} />
-        <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEBC2E" }} />
-        <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#28C840" }} />
+        <span
+          aria-hidden
+          style={{ width: 12, height: 12, borderRadius: "50%", background: "#FF5F57" }}
+        />
+        <span
+          aria-hidden
+          style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEBC2E" }}
+        />
+        <span
+          aria-hidden
+          style={{ width: 12, height: 12, borderRadius: "50%", background: "#28C840" }}
+        />
         <span
           style={{
             marginLeft: "auto",
@@ -39,11 +39,9 @@ export function Terminal({ filename, tool, date, children }: TerminalProps) {
             color: "var(--ink-tertiary)",
           }}
         >
-          {filename}
+          {log.filename}
         </span>
       </div>
-
-      {/* Body */}
       <div
         style={{
           padding: "20px 24px",
@@ -55,14 +53,13 @@ export function Terminal({ filename, tool, date, children }: TerminalProps) {
           overflowX: "auto",
         }}
       >
-        {(tool || date) && (
-          <div style={{ color: "var(--signal)", fontSize: 11, marginBottom: 12 }}>
-            {tool}
-            {tool && date ? " · " : ""}
-            {date}
-          </div>
+        <div style={{ color: "var(--signal)", fontSize: 11, marginBottom: 12 }}>
+          {log.tool} · {log.date}
+        </div>
+        <div style={{ color: "#4B5563" }}>{log.prompt}</div>
+        {log.output && (
+          <div style={{ marginTop: 12, color: "#F0F0FF" }}>{log.output}</div>
         )}
-        {children}
       </div>
     </div>
   );

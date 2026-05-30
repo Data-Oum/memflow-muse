@@ -69,7 +69,7 @@ const personLd = {
   url: SITE_URL,
   email: "mailto:amit@devamit.co.in",
   telephone: "+91-9874173663",
-  image: `${SITE_URL}/icon-512.png`,
+  image: `${SITE_URL}/amit-portrait.jpg`,
   address: {
     "@type": "PostalAddress",
     addressLocality: "Kolkata",
@@ -196,6 +196,24 @@ const projectsItemListLd = {
   })),
 };
 
+const portfolioCollectionLd = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": `${SITE_URL}/#portfolio`,
+  url: SITE_URL,
+  name: "Amit Chakraborty Portfolio",
+  description: DESCRIPTION,
+  mainEntity: { "@id": `${SITE_URL}/#projects` },
+  creator: { "@id": `${SITE_URL}/#person` },
+  hasPart: PROJECTS_LD.map((project) => ({
+    "@type": "CreativeWork",
+    name: project.name,
+    url: project.url,
+    description: project.description,
+    creator: { "@id": `${SITE_URL}/#person` },
+  })),
+};
+
 const faqLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -249,7 +267,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: `${FULL_NAME} — Principal Frontend · mem0` },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:site_name", content: "Amit Chakraborty Portfolio" },
-      { property: "og:image", content: `${SITE_URL}/og-card.png` },
+      { property: "og:image", content: `${SITE_URL}/amit-portrait.jpg` },
       { property: "og:image:alt", content: `${FULL_NAME} — Principal Architect` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
@@ -264,7 +282,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:creator", content: "@devamitch" },
       { name: "twitter:title", content: `${FULL_NAME} — Principal Frontend · mem0` },
       { name: "twitter:description", content: DESCRIPTION },
-      { name: "twitter:image", content: `${SITE_URL}/og-card.png` },
+      { name: "twitter:image", content: `${SITE_URL}/amit-portrait.jpg` },
       { name: "twitter:image:alt", content: `${FULL_NAME} — Principal Architect` },
 
       // ── GEO (Geographic SEO)
@@ -317,6 +335,10 @@ export const Route = createFileRoute("/")({
       {
         type: "application/ld+json",
         children: JSON.stringify(projectsItemListLd),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(portfolioCollectionLd),
       },
       // FAQ — AEO answer cards
       {
