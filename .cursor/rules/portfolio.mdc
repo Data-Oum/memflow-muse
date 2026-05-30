@@ -1,0 +1,92 @@
+---
+description: memflow-muse portfolio rules — always apply
+alwaysApply: true
+---
+
+# memflow-muse Portfolio Rules
+
+## Identity
+
+This is Amit Chakraborty's personal portfolio, built as a live mem0 API demo
+for a Staff/Principal Frontend Engineer application at mem0.ai.
+
+**Stack:** TanStack Start + React 19 + TypeScript + Tailwind v4 + shadcn/ui + Bun
+
+---
+
+## Design System — Never Break These
+
+- **Light theme only.** No dark mode. No `prefers-color-scheme`. No dark backgrounds
+  except terminal panels (`#1A1D23`) in the Logs and Demo sections.
+- **One accent color:** `--signal: #16A07C` (mem0 emerald). Never add a second accent.
+- **Fonts:** Instrument Serif (display), Geist (body), JetBrains Mono (code/labels).
+  Never use Inter, Roboto, or Arial as display fonts.
+- **All colors** via CSS custom properties from `src/styles.css`. No hardcoded hex
+  values outside the PROJECTS data array and cluster color definitions.
+- **Spacing:** 8px base grid. Use multiples of 4px.
+- **Animations:** CSS keyframes or inline style transitions only.
+  No Framer Motion — this project deliberately avoids it.
+
+---
+
+## Code Style
+
+- **TypeScript strict** — no `any`, no non-null assertions without comments.
+- **Functional components only.** No class components.
+- **Inline styles** for all portfolio component layout/positioning.
+  Tailwind classes only for shadcn/ui primitives.
+- **No console.log** in committed code.
+- **All interactive elements** need `aria-label` or `aria-labelledby`.
+- **Focus rings** must be visible: `outline: 2px solid var(--signal)`.
+
+---
+
+## File Architecture
+
+- `src/components/portfolio/portfolio.tsx` — All portfolio sections live here.
+  This is intentional: one file, one scroll, one artifact. Don't split it up.
+- `src/lib/api/memory.functions.ts` — Server functions only. No UI imports.
+- `src/lib/mem0/mock-client.ts` — Client-side mock only. No server-only imports.
+
+---
+
+## mem0 API Rules
+
+- Server functions in `memory.functions.ts` always return:
+  `{ success: boolean; data: T; error?: string; apiMode: "real" | "mock" }`
+- The Demo component catches server function errors and falls back to the mock
+  client silently — the demo must NEVER break.
+- `apiMode: "real"` shows a green "● API Connected" indicator.
+  `apiMode: "mock"` shows amber "○ Local Demo Mode".
+
+---
+
+## What NOT to Change
+
+- The `Section` component's fade-up animation — one-shot via IntersectionObserver.
+- The `HeroStagger` component — stagger timing is calibrated.
+- `public/sw.js` cache version — bump it manually after significant asset changes.
+- The `PROJECTS` array `id` values — they're displayed as mem0 memory IDs.
+
+---
+
+## When Adding a Project
+
+Always include all 8 fields in the Project interface:
+`id, name, signal, tagline, category, score, year, url, impact, stack, description,
+roleHighlights (3 items), whyItMatters`.
+
+The `whyItMatters` field is the mem0-specific insight shown in the project modal.
+It must connect the project to mem0's memory architecture in a concrete, specific way.
+
+---
+
+## Commit Messages
+
+Use conventional commits:
+- `feat:` new section or feature
+- `fix:` bug fix
+- `style:` design/CSS changes
+- `perf:` performance improvement
+- `docs:` CLAUDE.md, PROMPTS.md, README changes
+- `chore:` dependencies, config

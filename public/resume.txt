@@ -1,0 +1,152 @@
+AMIT CHAKRABORTY
+Principal Architect · AI-Native Systems Engineer
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+amit@devamit.co.in  |  +91-9874173663
+linkedin.com/in/devamitch  |  devamit.co.in  |  github.com/devamitch
+Kolkata, West Bengal, India — Remote Only
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Senior React Native Engineer with 8+ years of professional software development,
+including 4+ years focused on iOS and Android mobile development for enterprise
+production systems. Expert in React Native (Bridgeless Architecture, JSI,
+TurboModules), TypeScript, and native modules (C++/Swift/Kotlin).
+
+Proven track record shipping 18+ production applications with specialized expertise
+in OAuth 2.0 authentication, secure token handling and refresh token workflows
+with enterprise identity provider integration. Built and automated CI/CD pipelines
+using GitHub Actions, Fastlane, and Firebase App Distribution — reducing release
+cycles from 2 days to 4 hours.
+
+Experienced conducting code reviews for internal and offshore development teams,
+mentoring engineers, and delivering Agile/Scrum sprints with consistent output.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KEY ACHIEVEMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+→ 18+ production mobile applications shipped across App Store and Play Store
+→ OAuth 2.0 authentication flows with enterprise identity provider integration
+→ CI/CD pipeline automation — reduced release cycle from 2 days to 4 hours
+→ Native modules (C++/Swift/Kotlin) — 60fps on low-end $150 Android devices
+→ Code reviews for internal and offshore developers across concurrent product lines
+→ 0 → 21 engineers scaled from zero — full hiring, onboarding, mentorship
+→ 50,000+ daily active users served with 99.9% uptime
+→ Dating MVP delivered in 90 days — client secured seed funding
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CORE EXPERTISE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Mobile:
+  React Native · Bridgeless · JSI · Fabric · TurboModules · Expo · Expo Router
+  TypeScript · Reanimated 3 · FlashList · MMKV · CodePush · EAS Update
+
+Auth & Security:
+  OAuth 2.0 · Secure Token Handling · Refresh Token Workflows · HttpOnly Cookies
+  Keychain/Keystore · HIPAA-Aligned Architecture · SQL Injection & XSS Hardening
+
+CI/CD:
+  GitHub Actions · Fastlane (match/gym/supply) · Firebase App Distribution
+  EAS Build · EAS Submit · Automated Unit Testing · Static Analysis
+
+iOS & Android:
+  App Store Connect · Google Play Console · Swift · Kotlin · APNs · FCM
+  Deep Linking · Universal Links · TestFlight
+
+AI/ML:
+  mem0 SDK · RAG Pipelines · Claude API · Gemini API · OpenAI API
+  MediaPipe · TensorFlow.js · WebGPU · Context Engineering · Prompt Architecture
+
+State Management:
+  Zustand · Redux Toolkit · RTK Query · React Query · TanStack Query
+
+Backend:
+  Node.js · NestJS · PostgreSQL · MongoDB · Redis · AWS · Docker · Firebase · GCP
+
+Web3:
+  Solidity · Ethereum · Wagmi v2 · Viem · Ethers.js · ERC-20/721/1155
+
+Practices:
+  Agile/Scrum · Sprint Planning · Code Reviews · Technical Mentorship
+  System Design · SDLC · Incident Response
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROFESSIONAL EXPERIENCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SYNAPSIS MEDICAL TECHNOLOGIES INC.
+Senior Full-Stack Software & Mobile Development Lead
+Jan 2025 – Feb 2026 · Edmonton, Canada (Remote) · Founding Engineer · HealthTech
+
+→ Designed enterprise-grade mobile applications using React Native from zero
+→ Implemented OAuth 2.0 authentication with enterprise identity provider integration
+→ Built CI/CD pipelines with Fastlane + GitHub Actions + Firebase App Distribution
+→ Engineered native modules (C++/Swift/Kotlin) for consistent frame stability
+→ HIPAA-aligned architecture for regulated HealthTech data handling
+→ Mentored developers — promoted 3 engineers to senior level
+→ Scaled 0 → 21 engineers — designed hiring, onboarding, sprint processes
+→ Delivered 5 production applications in 13 months with 99.9% uptime
+
+─────────────────────────────────────────────────────────────────
+
+NONCEBLOX PVT. LTD.
+Lead Mobile Architect & Senior Full-Stack Engineer
+Oct 2021 – Jan 2025 · Dubai (Remote) · FinTech / Web3 / Gaming
+
+→ 13+ production apps across FinTech, Web3, consumer — 50K+ daily active users
+→ Secure payment systems across 6 providers (Stripe, Razorpay, PayU, Binance Pay)
+→ Optimized performance with native modules, rendering optimizations
+→ Code reviews for internal and offshore teams across 4–5 concurrent product lines
+→ Owned iOS and Android deployment pipelines
+→ Mentored 8+ engineers over 3+ years
+
+Notable apps shipped:
+  • Vulcan Eleven — Fantasy sports, 50K+ DAU, C++ native, Razorpay + Binance Pay
+  • DeFi11 — On-chain fantasy sports, Solidity, Ethereum, NFT marketplace
+  • Housezy — PropTech, Expo Router, GraphQL, PayU
+  • Be4You — Dating MVP, WebRTC, PostGIS — 90 days → client secured seed funding
+  • MusicX — Music competition, blockchain royalties, C++ audio processing
+
+─────────────────────────────────────────────────────────────────
+
+TECHPROMIND & WEBSKITTERS
+PHP Developer
+May 2017 – Sept 2021 · Kolkata, India · Government & Enterprise Systems
+
+→ 13+ government systems with zero post-deployment security incidents
+→ GST Merchant Portal built from scratch — 40% efficiency improvement
+→ Hardened against SQL injection, XSS, session hijacking
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+INDEPENDENT PROJECTS (Feb 2026 – Present)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Aura Arena       AI movement PWA · MediaPipe <16ms · Supabase Realtime · WebGPU
+                 auraarena.devamit.co.in
+
+HarmonyBloom     Wellness TMA · AES-256-GCM · On-device AI · Gamified · Telegram
+                 harmonybloom.devamit.co.in
+
+KSHEM            Land intelligence · 20+ portals · AI documents · GIS · PostGIS
+                 kshem.devamit.co.in
+
+Aura Studio      AI orchestration · 45+ nodes · React Flow · Gemini · NestJS
+                 aurastudio.devamit.co.in
+
+Neev             Family OS · Claude AI · Next.js 16 · Firebase
+                 neev.devamit.co.in
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EDUCATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MCA  Techno Main Salt Lake, Kolkata  2018–2021  8.61 CGPA
+BCA  The Heritage Academy, Kolkata   2014–2017  7.23 CGPA
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+devamit.co.in · github.com/devamitch · linkedin.com/in/devamitch
