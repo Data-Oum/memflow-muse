@@ -1,6 +1,4 @@
 import { useScrollSpy } from "@/hooks/use-scroll-spy";
-import { Menu, X } from "lucide-react";
-import { useState } from "react";
 
 const NAV_LINKS = [
   { id: "about", label: "About" },
@@ -16,40 +14,44 @@ export function Nav() {
     NAV_LINKS.map((n) => n.id),
     120,
   );
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <>
-      <header
+      {/* Desktop Floating Pill Header */}
+      <div
         style={{
           position: "sticky",
-          top: 0,
+          top: 24,
           zIndex: 100,
-          height: 56,
-          background: "rgba(247,248,250,0.90)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          borderBottom: "1px solid var(--edge-subtle)",
+          display: "flex",
+          justifyContent: "center",
+          padding: "0 24px",
+          pointerEvents: "none",
         }}
+        className="hide-on-mobile"
       >
-        <nav
+        <header
           style={{
-            maxWidth: 1080,
-            margin: "0 auto",
-            padding: "0 24px",
-            height: "100%",
-            display: "flex",
+            pointerEvents: "auto",
+            height: 48,
+            background: "rgba(255, 255, 255, 0.65)",
+            backdropFilter: "blur(24px) saturate(200%)",
+            WebkitBackdropFilter: "blur(24px) saturate(200%)",
+            border: "1px solid rgba(0,0,0,0.06)",
+            borderRadius: "var(--r-full)",
+            boxShadow: "0 12px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1)",
+            padding: "0 8px 0 20px",
+            display: "inline-flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            gap: 16,
+            gap: 24,
           }}
-          aria-label="Primary"
         >
           <a
             href="#hero"
-            className="font-mono"
             style={{
-              fontSize: 13,
+              fontFamily: "var(--font-mono)",
+              fontSize: 12,
+              fontWeight: 600,
               color: "var(--ink-primary)",
               textDecoration: "none",
               transition: "color 0.2s",
@@ -61,9 +63,9 @@ export function Nav() {
           </a>
 
           {/* Desktop links */}
-          <div
-            style={{ display: "flex", gap: 24, alignItems: "center" }}
-            className="hide-on-mobile"
+          <nav
+            style={{ display: "flex", gap: 4, alignItems: "center" }}
+            aria-label="Desktop Navigation"
           >
             {NAV_LINKS.map((n) => {
               const isActive = active === n.id;
@@ -73,135 +75,130 @@ export function Nav() {
                   href={`#${n.id}`}
                   style={{
                     fontFamily: "var(--font-sans)",
-                    fontSize: 14,
-                    position: "relative",
-                    color: isActive ? "var(--signal)" : "var(--ink-secondary)",
-                    fontWeight: isActive ? 500 : 400,
+                    fontSize: 12,
+                    color: isActive ? "var(--ink-primary)" : "var(--ink-tertiary)",
+                    fontWeight: isActive ? 600 : 400,
                     textDecoration: "none",
-                    transition: "color 0.2s",
-                    padding: "4px 0",
+                    transition: "color 0.2s, background 0.2s",
+                    padding: "6px 12px",
+                    borderRadius: "var(--r-full)",
+                    background: isActive ? "rgba(0,0,0,0.05)" : "transparent",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.color = "var(--ink-secondary)";
+                      e.currentTarget.style.background = "rgba(0,0,0,0.03)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.color = "var(--ink-tertiary)";
+                      e.currentTarget.style.background = "transparent";
+                    }
                   }}
                 >
                   {n.label}
-                  {isActive && (
-                    <span
-                      aria-hidden
-                      style={{
-                        position: "absolute",
-                        bottom: -4,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        width: 4,
-                        height: 4,
-                        borderRadius: "50%",
-                        background: "var(--signal)",
-                      }}
-                    />
-                  )}
                 </a>
               );
             })}
-          </div>
+          </nav>
 
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-            <a
-              href="#contact"
-              style={{
-                background: "var(--signal-light)",
-                border: "1px solid var(--signal-border)",
-                color: "var(--signal)",
-                fontFamily: "var(--font-mono)",
-                fontSize: 12,
-                padding: "6px 14px",
-                borderRadius: "var(--r-full)",
-                textDecoration: "none",
-                transition: "background 0.2s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(22,160,124,0.15)")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "var(--signal-light)")}
-            >
-              Open to roles &rarr;
-            </a>
-
-            {/* Hamburger — mobile only */}
-            <button
-              type="button"
-              aria-label="Open menu"
-              className="show-on-mobile"
-              onClick={() => setMobileOpen(true)}
-              style={{
-                background: "transparent",
-                border: "1px solid var(--edge-default)",
-                borderRadius: "var(--r-sm)",
-                width: 36,
-                height: 36,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                color: "var(--ink-secondary)",
-              }}
-            >
-              <Menu aria-hidden size={16} />
-            </button>
-          </div>
-        </nav>
-      </header>
-
-      {/* Mobile overlay */}
-      {mobileOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 200,
-            background: "var(--bg-page)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 32,
-          }}
-        >
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={() => setMobileOpen(false)}
+          <a
+            href="#contact"
             style={{
-              position: "absolute",
-              top: 16,
-              right: 20,
-              background: "transparent",
-              border: "none",
-              width: 36,
-              height: 36,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              color: "var(--ink-secondary)",
+              background: "var(--signal)",
+              color: "#FFF",
+              fontFamily: "var(--font-mono)",
+              fontWeight: 600,
+              fontSize: 10,
+              padding: "6px 14px",
+              borderRadius: "var(--r-full)",
+              textDecoration: "none",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              boxShadow: "0 4px 12px rgba(22,160,124,0.3)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.boxShadow = "0 6px 16px rgba(22,160,124,0.4)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(22,160,124,0.3)";
             }}
           >
-            <X aria-hidden size={20} />
-          </button>
-          {NAV_LINKS.map((n) => (
-            <a
-              key={n.id}
-              href={`#${n.id}`}
-              onClick={() => setMobileOpen(false)}
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontStyle: "italic",
-                fontSize: 28,
-                color: "var(--ink-primary)",
-                textDecoration: "none",
-              }}
-            >
-              {n.label}
-            </a>
-          ))}
-        </div>
-      )}
+            Available
+          </a>
+        </header>
+      </div>
+
+      {/* Mobile Floating Bottom Tab Navigation */}
+      <div
+        className="show-on-mobile"
+        style={{
+          position: "fixed",
+          bottom: 24,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          display: "flex",
+          justifyContent: "center",
+          pointerEvents: "none",
+          padding: "0 16px",
+        }}
+      >
+        <nav
+          style={{
+            pointerEvents: "auto",
+            background: "rgba(255, 255, 255, 0.75)",
+            backdropFilter: "blur(24px) saturate(200%)",
+            WebkitBackdropFilter: "blur(24px) saturate(200%)",
+            border: "1px solid rgba(0,0,0,0.06)",
+            borderRadius: "var(--r-full)",
+            boxShadow: "0 16px 48px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,1)",
+            padding: "6px",
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            width: "100%",
+            maxWidth: 400,
+          }}
+          aria-label="Mobile Navigation"
+        >
+          {NAV_LINKS.map((n) => {
+            const isActive = active === n.id;
+            return (
+              <a
+                key={n.id}
+                href={`#${n.id}`}
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: 40,
+                  borderRadius: "var(--r-full)",
+                  background: isActive ? "rgba(0,0,0,0.04)" : "transparent",
+                  color: isActive ? "var(--ink-primary)" : "var(--ink-tertiary)",
+                  textDecoration: "none",
+                  transition: "color 0.2s, background 0.2s",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 10,
+                    fontWeight: isActive ? 600 : 400,
+                  }}
+                >
+                  {n.label}
+                </span>
+              </a>
+            );
+          })}
+        </nav>
+      </div>
     </>
   );
 }
