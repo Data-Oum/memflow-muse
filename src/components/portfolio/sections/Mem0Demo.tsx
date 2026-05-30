@@ -173,9 +173,10 @@ export function Mem0Demo({
       <p
         style={{
           color: "var(--ink-secondary)",
-          fontSize: 16,
-          marginBottom: 32,
+          fontSize: 18,
+          marginBottom: 48,
           maxWidth: 640,
+          lineHeight: 1.6,
         }}
       >
         This demo runs the real mem0 API surface. Add memories. Search them. Watch the retrieval
@@ -193,13 +194,13 @@ export function Mem0Demo({
         <div
           style={{
             background: "var(--bg-surface)",
-            border: "1px solid var(--edge-default)",
-            borderTop: "3px solid var(--signal)",
+            border: "1px solid var(--edge-subtle)",
             borderRadius: "var(--r-lg)",
-            padding: 24,
+            padding: 32,
             display: "flex",
             flexDirection: "column",
-            gap: 14,
+            gap: 20,
+            boxShadow: "0 4px 24px rgba(0,0,0,0.02)",
           }}
         >
           <div
@@ -374,35 +375,54 @@ export function Mem0Demo({
             </div>
           )}
 
-          {/* Live code preview */}
+          {/* Live code preview - Terminal Style */}
           <div
             style={{
-              background: "#1A1D23",
+              background: "#0A0A0A",
+              border: "1px solid rgba(255,255,255,0.1)",
               borderRadius: "var(--r-md)",
-              padding: 16,
               fontFamily: "var(--font-mono)",
-              fontSize: 12,
+              fontSize: 13,
               lineHeight: 1.7,
-              color: "#9CA3AF",
-              overflow: "auto",
-              whiteSpace: "pre",
+              color: "#A1A1AA",
+              overflow: "hidden",
+              boxShadow: "0 12px 32px rgba(0,0,0,0.12)",
             }}
           >
-            {loading ? (
-              <span
-                style={{
-                  color: "var(--signal)",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                <Loader2 size={12} className="spin" />
-                Processing with Mem0...
-              </span>
-            ) : (
-              syntaxHighlight(code)
-            )}
+            {/* Terminal Header */}
+            <div
+              style={{
+                background: "rgba(255,255,255,0.05)",
+                borderBottom: "1px solid rgba(255,255,255,0.1)",
+                padding: "10px 16px",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FF5F56" }} />
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FFBD2E" }} />
+              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#27C93F" }} />
+              <div style={{ marginLeft: 8, fontSize: 11, color: "#71717A" }}>bash</div>
+            </div>
+            {/* Terminal Body */}
+            <div style={{ padding: 20, whiteSpace: "pre", overflowX: "auto" }}>
+              {loading ? (
+                <span
+                  style={{
+                    color: "var(--signal)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <Loader2 size={12} className="spin" />
+                  Processing with Mem0...
+                </span>
+              ) : (
+                syntaxHighlight(code)
+              )}
+            </div>
           </div>
         </div>
 
@@ -410,13 +430,14 @@ export function Mem0Demo({
         <div
           style={{
             background: "var(--bg-surface)",
-            border: "1px solid var(--edge-default)",
+            border: "1px solid var(--edge-subtle)",
             borderRadius: "var(--r-lg)",
-            padding: 24,
+            padding: 32,
             display: "flex",
             flexDirection: "column",
-            gap: 14,
+            gap: 20,
             minHeight: 360,
+            boxShadow: "0 4px 24px rgba(0,0,0,0.02)",
           }}
         >
           <div

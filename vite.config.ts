@@ -14,10 +14,7 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
-    // mem0ai is a Node.js-only SDK — keep it out of the client bundle
-    ssr: {
-      external: ["mem0ai"],
-    },
+    // mem0ai is a Node.js-only SDK - rely on Cloudflare's nodejs_compat instead of externalizing it
     optimizeDeps: {
       exclude: ["mem0ai"],
     },

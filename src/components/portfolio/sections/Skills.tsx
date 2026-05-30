@@ -1,26 +1,16 @@
-import { Section } from "../ui/Section";
-import { Label } from "../ui/Label";
-import { CLUSTERS, type Cluster } from "../data/skills";
-import { useInView } from "@/hooks/use-in-view";
+import { Section } from '../ui/Section';
+import { Label } from '../ui/Label';
+import { CLUSTERS, type Cluster } from '../data/skills';
+import { useInView } from '@/hooks/use-in-view';
 
-function SkillBar({ score, color, animate }: { score: number; color: string; animate: boolean }) {
+function SkillBar({ score, color, isVisible }: { score: number; color: string; isVisible: boolean }) {
   return (
-    <div
-      style={{
-        width: "100%",
-        height: 3,
-        borderRadius: "var(--r-full)",
-        background: "var(--bg-raised)",
-        overflow: "hidden",
-      }}
-    >
+    <div className="h-[3px] w-full rounded-full bg-[var(--bg-raised)] overflow-hidden mt-1.5">
       <div
+        className="h-full rounded-full transition-all duration-1000 ease-out"
         style={{
-          height: "100%",
-          width: animate ? `${score}%` : "0%",
-          background: color,
-          borderRadius: "var(--r-full)",
-          transition: "width 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
+          width: isVisible ? `${score}%` : '0%',
+          backgroundColor: color,
         }}
       />
     </div>
@@ -28,78 +18,44 @@ function SkillBar({ score, color, animate }: { score: number; color: string; ani
 }
 
 function ClusterCard({ cluster }: { cluster: Cluster }) {
-  const { ref, inView } = useInView<HTMLDivElement>(0.2);
+  const { ref, isInView } = useInView(0.2);
 
   return (
-    <div ref={ref} className="pm-card" style={{ padding: 24 }}>
-      <span
-        style={{
-          display: "inline-block",
-          fontFamily: "var(--font-mono)",
-          fontSize: 11,
-          color: cluster.color,
-          background: cluster.ghost,
-          padding: "4px 10px",
-          borderRadius: "var(--r-full)",
-          marginBottom: 16,
-          fontWeight: 500,
-        }}
-      >
-        {cluster.label}
-      </span>
+    <div ref={ref} className="pm-card p-6 flex flex-col gap-5">
+      <div>
+        <span
+          className="inline-flex items-center px-2 py-0.5 rounded-full font-mono text-[11px]"
+          style={{
+            color: cluster.color,
+            backgroundColor: cluster.ghost || `${cluster.color}1A`,
+          }}
+        >
+          {cluster.label}
+        </span>
+      </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <div className="flex flex-col gap-4">
         {cluster.skills.map((skill, i) => (
-          <div
-            key={skill.name}
-            style={{
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0)" : "translateY(8px)",
-              transition: `opacity 0.4s ease ${i * 60}ms, transform 0.4s ease ${i * 60}ms`,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "baseline",
-                marginBottom: 2,
-              }}
-            >
+          <div key={i} className="flex flex-col">
+            <div className="flex justify-between items-baseline mb-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-[13px] font-sans font-medium text-[var(--ink-primary)]">
+                  {skill.name}
+                </span>
+                {skill.note && (
+                  <span className="text-[10px] font-mono text-[var(--ink-tertiary)]">
+                    {skill.note}
+                  </span>
+                )}
+              </div>
               <span
-                style={{
-                  fontSize: 13,
-                  color: "var(--ink-primary)",
-                  fontWeight: 500,
-                }}
-              >
-                {skill.name}
-              </span>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 11,
-                  color: cluster.color,
-                  fontWeight: 600,
-                }}
+                className="text-[11px] font-mono"
+                style={{ color: cluster.color }}
               >
                 {skill.score}
               </span>
             </div>
-
-            <span
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 10,
-                color: "var(--ink-tertiary)",
-                display: "block",
-                marginBottom: 6,
-              }}
-            >
-              {skill.note}
-            </span>
-
-            <SkillBar score={skill.score} color={cluster.color} animate={inView} />
+            <SkillBar score={skill.score} color={cluster.color} isVisible={isInView} />
           </div>
         ))}
       </div>
@@ -110,40 +66,16 @@ function ClusterCard({ cluster }: { cluster: Cluster }) {
 export function Skills() {
   return (
     <Section id="skills">
-      <Label>{"[ memory.getCategories() ]"}</Label>
-
-      <h2
-        style={{
-          fontFamily: "var(--font-serif)",
-          fontSize: 36,
-          fontWeight: 400,
-          color: "var(--ink-primary)",
-          margin: "12px 0 8px",
-          lineHeight: 1.2,
-        }}
-      >
-        <i>Technical</i> memory index.
-      </h2>
-
-      <p
-        style={{
-          fontSize: 14,
-          color: "var(--ink-secondary)",
-          lineHeight: 1.6,
-          margin: "0 0 48px",
-          maxWidth: 520,
-        }}
-      >
-        Proficiency mapped as retrieval scores — the higher the score, the faster I ship production
-        code in that domain.
-      </p>
+      <div className="flex flex-col gap-3 mb-10">
+        <Label>{'[ memory.getCategories({ entity: "amit_chakraborty" }) ]'}</Label>
+        <h2 className="text-3xl md:text-4xl font-serif text-[var(--ink-primary)]">
+          Technical memory index.
+        </h2>
+      </div>
 
       <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: 16,
-        }}
+        className="grid gap-4"
+        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}
       >
         {CLUSTERS.map((cluster) => (
           <ClusterCard key={cluster.id} cluster={cluster} />
