@@ -38,9 +38,7 @@ self.addEventListener("activate", (event) => {
       .keys()
       .then((keys) =>
         Promise.all(
-          keys
-            .filter((key) => !key.startsWith(CACHE_VERSION))
-            .map((key) => caches.delete(key)),
+          keys.filter((key) => !key.startsWith(CACHE_VERSION)).map((key) => caches.delete(key)),
         ),
       )
       .then(() => self.clients.claim()),
@@ -73,7 +71,11 @@ self.addEventListener("fetch", (event) => {
   }
 
   // 5. Images and static documents — stale while revalidate
-  if (request.destination === "image" || url.pathname.endsWith(".pdf") || url.pathname.endsWith(".txt")) {
+  if (
+    request.destination === "image" ||
+    url.pathname.endsWith(".pdf") ||
+    url.pathname.endsWith(".txt")
+  ) {
     event.respondWith(staleWhileRevalidate(request, IMAGE_CACHE));
     return;
   }

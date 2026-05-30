@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
 import { useScrollSpy } from "@/hooks/use-scroll-spy";
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
 
 const NAV_LINKS = [
   { id: "about", label: "About" },
@@ -54,12 +54,8 @@ export function Nav() {
               textDecoration: "none",
               transition: "color 0.2s",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.color = "var(--signal)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = "var(--ink-primary)")
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--signal)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-primary)")}
           >
             amit.co
           </a>
@@ -79,9 +75,7 @@ export function Nav() {
                     fontFamily: "var(--font-sans)",
                     fontSize: 14,
                     position: "relative",
-                    color: isActive
-                      ? "var(--signal)"
-                      : "var(--ink-secondary)",
+                    color: isActive ? "var(--signal)" : "var(--ink-secondary)",
                     fontWeight: isActive ? 500 : 400,
                     textDecoration: "none",
                     transition: "color 0.2s",
@@ -123,14 +117,8 @@ export function Nav() {
                 textDecoration: "none",
                 transition: "background 0.2s",
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background =
-                  "rgba(22,160,124,0.15)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background =
-                  "var(--signal-light)")
-              }
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(22,160,124,0.15)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "var(--signal-light)")}
             >
               Open to roles &rarr;
             </a>

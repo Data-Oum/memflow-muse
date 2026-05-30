@@ -86,7 +86,8 @@ await mem0.add([
             maxWidth: 640,
           }}
         >
-          I&apos;ve studied the SDK. I&apos;ve built the demo. I&apos;ve shipped the logs. Here&apos;s how to reach me.
+          I&apos;ve studied the SDK. I&apos;ve built the demo. I&apos;ve shipped the logs.
+          Here&apos;s how to reach me.
         </p>
 
         <div

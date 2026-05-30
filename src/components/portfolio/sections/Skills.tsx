@@ -3,15 +3,7 @@ import { Label } from "../ui/Label";
 import { CLUSTERS, type Cluster } from "../data/skills";
 import { useInView } from "@/hooks/use-in-view";
 
-function SkillBar({
-  score,
-  color,
-  animate,
-}: {
-  score: number;
-  color: string;
-  animate: boolean;
-}) {
+function SkillBar({ score, color, animate }: { score: number; color: string; animate: boolean }) {
   return (
     <div
       style={{
@@ -39,11 +31,7 @@ function ClusterCard({ cluster }: { cluster: Cluster }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.2);
 
   return (
-    <div
-      ref={ref}
-      className="pm-card"
-      style={{ padding: 24 }}
-    >
+    <div ref={ref} className="pm-card" style={{ padding: 24 }}>
       <span
         style={{
           display: "inline-block",
@@ -111,11 +99,7 @@ function ClusterCard({ cluster }: { cluster: Cluster }) {
               {skill.note}
             </span>
 
-            <SkillBar
-              score={skill.score}
-              color={cluster.color}
-              animate={inView}
-            />
+            <SkillBar score={skill.score} color={cluster.color} animate={inView} />
           </div>
         ))}
       </div>
@@ -150,8 +134,8 @@ export function Skills() {
           maxWidth: 520,
         }}
       >
-        Proficiency mapped as retrieval scores — the higher the score, the
-        faster I ship production code in that domain.
+        Proficiency mapped as retrieval scores — the higher the score, the faster I ship production
+        code in that domain.
       </p>
 
       <div

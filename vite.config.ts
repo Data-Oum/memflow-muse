@@ -20,5 +20,6 @@ export default defineConfig({
     optimizeDeps: {
       exclude: ["mem0ai"],
     },
+    plugins: [],
   },
 });

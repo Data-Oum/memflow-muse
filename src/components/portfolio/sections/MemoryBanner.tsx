@@ -45,8 +45,7 @@ export function MemoryBanner() {
           gap: 8,
         }}
       >
-        <Bell size={12} />
-        [ memory recalled ] · Welcome back. You&apos;ve been here before.
+        <Bell size={12} />[ memory recalled ] · Welcome back. You&apos;ve been here before.
       </span>
       <button
         type="button"

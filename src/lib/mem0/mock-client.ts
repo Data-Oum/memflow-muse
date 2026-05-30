@@ -1,10 +1,4 @@
-export type MemoryCategory =
-  | "preference"
-  | "identity"
-  | "work"
-  | "location"
-  | "goal"
-  | "general";
+export type MemoryCategory = "preference" | "identity" | "work" | "location" | "goal" | "general";
 
 export interface MemoryEntry {
   id: string;
@@ -31,7 +25,11 @@ export function extractMemory(content: string): string {
     [/^i\s+like\s+(.+)$/i, (m) => `User likes ${m[1]}`],
     [/^i\s+hate\s+(.+)$/i, (m) => `User hates ${m[1]}`],
     [/^i\s+enjoy\s+(.+)$/i, (m) => `User enjoys ${m[1]}`],
-    [/^i'?m\s+(?:a\s+|an\s+)?(.+)$/i, (m) => `User is ${/^a |^an /i.test(m[1]) ? m[1] : `a ${m[1]}`.replace(/^a (a|e|i|o|u)/i, "an $1")}`],
+    [
+      /^i'?m\s+(?:a\s+|an\s+)?(.+)$/i,
+      (m) =>
+        `User is ${/^a |^an /i.test(m[1]) ? m[1] : `a ${m[1]}`.replace(/^a (a|e|i|o|u)/i, "an $1")}`,
+    ],
     [/^i\s+am\s+(.+)$/i, (m) => `User is ${m[1]}`],
     [/^i\s+work\s+(.+)$/i, (m) => `User works ${m[1]}`],
     [/^i\s+built\s+(.+)$/i, (m) => `User built ${m[1]}`],
@@ -93,9 +91,7 @@ export class MockMem0Client {
   ): Promise<MemorySearchResult[]> {
     await delay(250 + Math.random() * 300);
     const userId = filters.user_id;
-    const all = [...this.store.values()].filter(
-      (m) => !userId || m.user_id === userId,
-    );
+    const all = [...this.store.values()].filter((m) => !userId || m.user_id === userId);
     return all
       .map((m) => ({ ...m, score: (0.75 + Math.random() * 0.24).toFixed(2) }))
       .sort((a, b) => Number(b.score) - Number(a.score))
@@ -104,9 +100,7 @@ export class MockMem0Client {
 
   async getAll({ user_id }: { user_id?: string } = {}): Promise<MemoryEntry[]> {
     await delay(200);
-    return [...this.store.values()].filter(
-      (m) => !user_id || m.user_id === user_id,
-    );
+    return [...this.store.values()].filter((m) => !user_id || m.user_id === user_id);
   }
 
   async delete(memoryId: string): Promise<{ message: string }> {

@@ -14,13 +14,7 @@ const fadeInKeyframes = `
 }
 `;
 
-export function ProjectModal({
-  project,
-  onClose,
-}: {
-  project: Project;
-  onClose: () => void;
-}) {
+export function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -78,8 +72,8 @@ export function ProjectModal({
               width: "100%",
               maxHeight: "90vh",
               overflowY: "auto",
-              boxShadow: "var(--shadow-lg)",
-              border: "1px solid var(--edge-default)",
+              boxShadow: "0 10px 40px rgba(0,0,0,0.06)",
+              border: "none",
               animation: "modalSlideIn 0.3s ease-out both",
             } as CSSProperties
           }
@@ -120,8 +114,8 @@ export function ProjectModal({
                 alignItems: "center",
                 justifyContent: "center",
                 borderRadius: "var(--r-sm)",
-                border: "1px solid var(--edge-default)",
-                background: "var(--bg-surface)",
+                border: "none",
+                background: "var(--bg-raised)",
                 color: "var(--ink-secondary)",
                 cursor: "pointer",
                 transition: "border-color 0.2s var(--ease), color 0.2s var(--ease)",
@@ -145,7 +139,7 @@ export function ProjectModal({
                   fontFamily: "var(--font-mono)",
                   color: project.signal,
                   background: `${project.signal}10`,
-                  border: `1px solid ${project.signal}25`,
+                  border: "none",
                   borderRadius: "var(--r-full)",
                   padding: "2px 10px",
                   letterSpacing: "0.02em",
@@ -162,9 +156,7 @@ export function ProjectModal({
                 }}
               >
                 {project.id} · score{" "}
-                <strong style={{ color: project.signal }}>
-                  {project.score.toFixed(2)}
-                </strong>
+                <strong style={{ color: project.signal }}>{project.score.toFixed(2)}</strong>
               </span>
             </div>
 
@@ -360,7 +352,7 @@ export function ProjectModal({
             <section
               style={{
                 background: `${project.signal}08`,
-                border: `1px solid ${project.signal}18`,
+                border: "none",
                 borderRadius: "var(--r-md)",
                 padding: "16px 20px",
               }}
@@ -373,11 +365,7 @@ export function ProjectModal({
                   marginBottom: 8,
                 }}
               >
-                <Brain
-                  aria-hidden
-                  size={16}
-                  style={{ color: project.signal }}
-                />
+                <Brain aria-hidden size={16} style={{ color: project.signal }} />
                 <span
                   style={{
                     fontSize: 12,
@@ -426,7 +414,7 @@ export function ProjectModal({
                       borderRadius: "var(--r-sm)",
                       background: "var(--bg-raised)",
                       color: "var(--ink-secondary)",
-                      border: "1px solid var(--edge-subtle)",
+                      border: "none",
                     }}
                   >
                     {t}
@@ -447,9 +435,7 @@ export function ProjectModal({
                 borderTop: "1px solid var(--edge-subtle)",
               }}
             >
-              <span style={{ color: project.signal, marginRight: 6 }}>
-                &rarr;
-              </span>
+              <span style={{ color: project.signal, marginRight: 6 }}>&rarr;</span>
               {project.impact}
             </p>
 
@@ -470,8 +456,8 @@ export function ProjectModal({
                   fontFamily: "var(--font-mono)",
                   padding: "8px 18px",
                   borderRadius: "var(--r-sm)",
-                  border: "1px solid var(--edge-default)",
-                  background: "var(--bg-surface)",
+                  border: "none",
+                  background: "var(--bg-raised)",
                   color: "var(--ink-secondary)",
                   cursor: "pointer",
                   transition: "border-color 0.2s var(--ease)",

@@ -1,10 +1,6 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { Search, Plus, Trash2, Loader2 } from "lucide-react";
-import {
-  mem0 as mockMem0,
-  CATEGORY_COLORS,
-  type MemoryCategory,
-} from "@/lib/mem0/mock-client";
+import { mem0 as mockMem0, CATEGORY_COLORS, type MemoryCategory } from "@/lib/mem0/mock-client";
 import {
   addMemoryFn,
   searchMemoryFn,
@@ -305,11 +301,7 @@ export function Mem0Demo({
                 gap: 6,
               }}
             >
-              {loading === "add" ? (
-                <Loader2 size={14} className="spin" />
-              ) : (
-                <Plus size={14} />
-              )}
+              {loading === "add" ? <Loader2 size={14} className="spin" /> : <Plus size={14} />}
               {loading === "add" ? "Storing..." : "Store Memory"}
             </button>
             <button
@@ -372,7 +364,11 @@ export function Mem0Demo({
                   gap: 6,
                 }}
               >
-                {loading === "search" ? <Loader2 size={14} className="spin" /> : <Search size={14} />}
+                {loading === "search" ? (
+                  <Loader2 size={14} className="spin" />
+                ) : (
+                  <Search size={14} />
+                )}
                 Run
               </button>
             </div>
@@ -393,7 +389,14 @@ export function Mem0Demo({
             }}
           >
             {loading ? (
-              <span style={{ color: "var(--signal)", display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <span
+                style={{
+                  color: "var(--signal)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
                 <Loader2 size={12} className="spin" />
                 Processing with Mem0...
               </span>

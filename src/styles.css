@@ -172,6 +172,27 @@
     overflow-x: hidden;
   }
 
+  /* ── Apple-style Lean Glassmorphic Scrollbars ── */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    border: 3px solid var(--bg-page);
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
   ::selection { background: var(--signal-light); color: var(--signal); }
 
   *:focus-visible {
@@ -226,16 +247,15 @@
 /* ── Card hover baseline ─────────────────────────────── */
 .pm-card {
   background: var(--bg-surface);
-  border: 1px solid var(--edge-default);
+  border: none;
   border-radius: var(--r-lg);
   padding: 28px;
-  box-shadow: var(--shadow-sm);
-  transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), transform 0.3s var(--ease);
+  box-shadow: none;
+  transition: background 0.3s var(--ease), transform 0.3s var(--ease);
 }
 .pm-card:hover {
-  border-color: var(--edge-signal);
-  box-shadow: var(--shadow-signal);
-  transform: translateY(-3px);
+  background: var(--bg-raised);
+  transform: translateY(-2px);
 }
 
 .sr-only {
@@ -422,10 +442,10 @@
   padding: 24px;
   overflow: hidden;
   background: var(--bg-surface);
-  border: 1px solid var(--edge-default);
+  border: none;
   border-radius: var(--r-lg);
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
+  box-shadow: none;
+  transition: transform 0.25s var(--ease), background 0.25s var(--ease);
 }
 .project-card::before {
   content: "";
@@ -436,8 +456,7 @@
 }
 .project-card:hover {
   transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--project) 45%, transparent);
-  box-shadow: 0 14px 38px color-mix(in srgb, var(--project) 18%, transparent);
+  background: var(--bg-raised);
 }
 .project-score,
 .project-card footer,
@@ -540,7 +559,7 @@
   max-height: min(880px, 92vh);
   overflow: auto;
   background: var(--bg-surface);
-  border: 1px solid var(--edge-default);
+  border: none;
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-lg);
 }
@@ -594,7 +613,7 @@
   margin-top: 24px;
 }
 .modal-columns section {
-  border: 1px solid var(--edge-subtle);
+  border: none;
   border-radius: var(--r-md);
   padding: 18px;
   background: var(--bg-page);
@@ -649,10 +668,10 @@
 }
 .demo-panel {
   background: var(--bg-surface);
-  border: 1px solid var(--edge-default);
+  border: none;
   border-radius: var(--r-lg);
   padding: 24px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 .demo-status {
   width: fit-content;
@@ -733,12 +752,11 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px;
-  border: 1px solid var(--edge-subtle);
+  border: none;
   border-radius: var(--r-sm);
   background: var(--bg-page);
 }
 .memory-row.is-match {
-  border-color: var(--signal-border);
   background: var(--signal-light);
 }
 .memory-row strong {
@@ -772,7 +790,7 @@
 
 .terminal-card {
   background: var(--bg-surface);
-  border: 1px solid var(--edge-default);
+  border: none;
   border-radius: var(--r-lg);
   overflow: hidden;
 }
@@ -781,7 +799,7 @@
   align-items: center;
   gap: 8px;
   padding: 12px 14px;
-  border-bottom: 1px solid var(--edge-subtle);
+  border-bottom: none;
 }
 .terminal-card header strong {
   color: var(--ink-primary);
@@ -819,9 +837,9 @@
   align-items: center;
   padding: 28px;
   background: var(--bg-surface);
-  border: 1px solid var(--edge-default);
+  border: none;
   border-radius: var(--r-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 .contact-meta {
   display: flex;

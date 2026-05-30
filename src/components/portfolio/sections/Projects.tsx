@@ -5,13 +5,7 @@ import { Label } from "../ui/Label";
 import { PROJECTS, type Project } from "../data/projects";
 import { useInView } from "@/hooks/use-in-view";
 
-function ProjectCard({
-  p,
-  onSelect,
-}: {
-  p: Project;
-  onSelect: (p: Project) => void;
-}) {
+function ProjectCard({ p, onSelect }: { p: Project; onSelect: (p: Project) => void }) {
   const { ref, inView } = useInView<HTMLDivElement>(0.18);
   const visibleStack = p.stack.slice(0, 4);
   const overflowCount = p.stack.length - visibleStack.length;
@@ -276,11 +270,7 @@ function ProjectCard({
   );
 }
 
-export function Projects({
-  onSelect,
-}: {
-  onSelect: (p: Project) => void;
-}) {
+export function Projects({ onSelect }: { onSelect: (p: Project) => void }) {
   return (
     <Section id="work">
       <Label>{"[ memory.search({ category: 'shipped_work' }) ]"}</Label>
@@ -305,8 +295,8 @@ export function Projects({
           margin: "0 0 32px",
         }}
       >
-        Six of 18+ production systems. Each had real users, real stakes, and
-        durable context problems.
+        Six of 18+ production systems. Each had real users, real stakes, and durable context
+        problems.
       </p>
       <div
         style={{

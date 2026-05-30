@@ -1,20 +1,19 @@
-import { Brain, Zap, Target } from "lucide-react";
 import { Section } from "../ui/Section";
 import { Label } from "../ui/Label";
 
 const PRINCIPLES = [
   {
-    icon: Brain,
+    index: "01",
     title: "Memory-First Design",
     body: "State is ephemeral. Memory is persistent. I architect systems around long-lived memory graphs — user context, preferences, and behavioral patterns that compound over time, not session-scoped state that dies on refresh.",
   },
   {
-    icon: Zap,
+    index: "02",
     title: "AI as Co-Pilot, Not Crutch",
-    body: "Claude Code, Cursor, Gemini — I use them daily. But the architecture decisions, the trade-off judgments, the \"this will break at 50K DAU\" instinct — that's 8 years of production muscle memory no model replaces.",
+    body: 'Claude Code, Cursor, Gemini — I use them daily. But the architecture decisions, the trade-off judgments, the "this will break at 50K DAU" instinct — that\'s 8 years of production muscle memory no model replaces.',
   },
   {
-    icon: Target,
+    index: "03",
     title: "End-to-End Ownership",
     body: "From design system tokens to App Store submissions. From database schema to user feedback loops. I don't hand off — I ship the full vertical, then instrument it to learn what to ship next.",
   },
@@ -23,7 +22,7 @@ const PRINCIPLES = [
 export function Philosophy() {
   return (
     <Section id="about">
-      <Label>{"[ memory.get({ entity: \"principles\" }) ]"}</Label>
+      <Label>{'[ memory.get({ entity: "principles" }) ]'}</Label>
 
       <h2
         style={{
@@ -47,11 +46,19 @@ export function Philosophy() {
       >
         {PRINCIPLES.map((p) => (
           <div key={p.title} className="pm-card">
-            <p.icon
-              size={28}
-              style={{ color: "var(--signal)", marginBottom: 12 }}
-              strokeWidth={1.8}
-            />
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 12,
+                color: "var(--signal)",
+                marginBottom: 16,
+                paddingBottom: 8,
+                borderBottom: "1px solid var(--signal-border)",
+                display: "inline-block",
+              }}
+            >
+              [{p.index}]
+            </div>
             <h3
               style={{
                 fontSize: 18,

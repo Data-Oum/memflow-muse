@@ -34,7 +34,11 @@ export const CLUSTERS: Cluster[] = [
     skills: [
       { name: "mem0 SDK", score: 90, note: "This portfolio is proof" },
       { name: "RAG Pipelines", score: 88, note: "HIPAA · 99.9% uptime · Pinecone" },
-      { name: "Claude / Gemini / OpenAI", score: 87, note: "Streaming · tool use · function calling" },
+      {
+        name: "Claude / Gemini / OpenAI",
+        score: 87,
+        note: "Streaming · tool use · function calling",
+      },
       { name: "MediaPipe CV", score: 84, note: "BlazePose · <16ms on mobile" },
       { name: "Context Engineering", score: 91, note: "Prompt architecture · memory injection" },
     ],

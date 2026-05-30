@@ -50,8 +50,7 @@ export function ResumeButton() {
     };
   }, []);
 
-  const Icon =
-    state === "downloading" ? Loader2 : state === "done" ? Check : Download;
+  const Icon = state === "downloading" ? Loader2 : state === "done" ? Check : Download;
 
   return (
     <button
@@ -86,10 +85,7 @@ export function ResumeButton() {
         gap: 8,
       }}
     >
-      <Icon
-        size={14}
-        className={state === "downloading" ? "spin" : undefined}
-      />
+      <Icon size={14} className={state === "downloading" ? "spin" : undefined} />
       {state === "downloading"
         ? "Preparing..."
         : state === "done"

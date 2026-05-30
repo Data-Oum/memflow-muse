@@ -57,9 +57,7 @@ export function Terminal({ log }: { log: TermLog }) {
           {log.tool} · {log.date}
         </div>
         <div style={{ color: "#4B5563" }}>{log.prompt}</div>
-        {log.output && (
-          <div style={{ marginTop: 12, color: "#F0F0FF" }}>{log.output}</div>
-        )}
+        {log.output && <div style={{ marginTop: 12, color: "#F0F0FF" }}>{log.output}</div>}
       </div>
     </div>
   );
