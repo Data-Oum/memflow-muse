@@ -1,0 +1,1429 @@
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import {
+  mem0,
+  CATEGORY_COLORS,
+  type MemoryEntry,
+  type MemorySearchResult,
+  type MemoryCategory,
+} from "@/lib/mem0/mock-client";
+import { useInView } from "@/hooks/use-in-view";
+import { useScrollSpy } from "@/hooks/use-scroll-spy";
+import { useTypewriter } from "@/hooks/use-typewriter";
+
+/* ---------------- shared ---------------- */
+
+function Section({
+  id,
+  children,
+  full,
+}: {
+  id: string;
+  children: ReactNode;
+  full?: boolean;
+}) {
+  const { ref, inView } = useInView<HTMLElement>(0.12);
+  return (
+    <section
+      id={id}
+      ref={ref}
+      className={`fade-up ${inView ? "in" : ""}`}
+      style={{
+        padding: "96px 24px",
+        maxWidth: full ? "100%" : 1080,
+        margin: "0 auto",
+        width: "100%",
+      }}
+    >
+      <div style={{ maxWidth: 1080, margin: "0 auto" }}>{children}</div>
+    </section>
+  );
+}
+
+function Label({ children }: { children: ReactNode }) {
+  return <span className="section-label">{children}</span>;
+}
+
+function Toast({ message }: { message: string | null }) {
+  if (!message) return null;
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="pm-slide-in"
+      style={{
+        position: "fixed",
+        bottom: 24,
+        right: 24,
+        background: "var(--ink-primary)",
+        color: "white",
+        padding: "10px 16px",
+        borderRadius: "var(--r-full)",
+        fontFamily: "var(--font-mono)",
+        fontSize: 12,
+        boxShadow: "var(--shadow-lg)",
+        zIndex: 200,
+      }}
+    >
+      {message}
+    </div>
+  );
+}
+
+/* ---------------- NAV ---------------- */
+
+const NAV = [
+  { id: "about", label: "About" },
+  { id: "skills", label: "Skills" },
+  { id: "work", label: "Work" },
+  { id: "demo", label: "Demo" },
+  { id: "logs", label: "Logs" },
+  { id: "contact", label: "Contact" },
+];
+
+function Nav() {
+  const active = useScrollSpy(NAV.map((n) => n.id), 120);
+  return (
+    <header
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        height: 56,
+        background: "rgba(247,248,250,0.85)",
+        backdropFilter: "blur(20px) saturate(180%)",
+        WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        borderBottom: "1px solid var(--edge-subtle)",
+      }}
+    >
+      <nav
+        style={{
+          maxWidth: 1080,
+          margin: "0 auto",
+          padding: "0 24px",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+        }}
+        aria-label="Primary"
+      >
+        <a
+          href="#hero"
+          className="font-mono"
+          style={{ fontSize: 13, color: "var(--ink-primary)", textDecoration: "none", transition: "color 0.2s" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "var(--signal)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-primary)")}
+        >
+          amit.co
+        </a>
+        <div style={{ display: "flex", gap: 24, alignItems: "center" }} className="hide-on-mobile">
+          {NAV.map((n) => {
+            const isActive = active === n.id;
+            return (
+              <a
+                key={n.id}
+                href={`#${n.id}`}
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 14,
+                  position: "relative",
+                  color: isActive ? "var(--signal)" : "var(--ink-secondary)",
+                  fontWeight: isActive ? 500 : 400,
+                  textDecoration: "none",
+                  transition: "color 0.2s",
+                  padding: "4px 0",
+                }}
+              >
+                {n.label}
+                {isActive && (
+                  <span
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      bottom: -4,
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: 4,
+                      height: 4,
+                      borderRadius: "50%",
+                      background: "var(--signal)",
+                    }}
+                  />
+                )}
+              </a>
+            );
+          })}
+        </div>
+        <a
+          href="#contact"
+          style={{
+            background: "var(--signal-light)",
+            border: "1px solid var(--signal-border)",
+            color: "var(--signal)",
+            fontFamily: "var(--font-mono)",
+            fontSize: 12,
+            padding: "6px 14px",
+            borderRadius: "var(--r-full)",
+            textDecoration: "none",
+            transition: "background 0.2s",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(22,160,124,0.15)")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "var(--signal-light)")}
+        >
+          Open to roles →
+        </a>
+      </nav>
+    </header>
+  );
+}
+
+/* ---------------- HERO ---------------- */
+
+function Hero() {
+  const [phase, setPhase] = useState<"intro" | "content">("intro");
+  const intro =
+    '> mem0.search("staff frontend engineer, india")\n[connecting to memory store...]\n[retrieved: 1 match]';
+  const { typed, done } = useTypewriter(intro, 18, phase === "intro");
+
+  useEffect(() => {
+    if (done) {
+      const t = window.setTimeout(() => setPhase("content"), 600);
+      return () => window.clearTimeout(t);
+    }
+  }, [done]);
+
+  const stats = [
+    { v: "8+", l: "Years shipping" },
+    { v: "18+", l: "Production apps" },
+    { v: "21", l: "Engineers led" },
+  ];
+
+  return (
+    <section
+      id="hero"
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        padding: "120px 24px 64px",
+        background:
+          "radial-gradient(ellipse 900px 500px at 50% 40%, rgba(22,160,124,0.06) 0%, transparent 65%)",
+        position: "relative",
+      }}
+    >
+      {phase === "intro" && (
+        <div
+          style={{
+            background: "var(--bg-surface)",
+            border: "1px solid var(--edge-signal)",
+            borderRadius: "var(--r-md)",
+            padding: "16px 24px",
+            maxWidth: 480,
+            fontFamily: "var(--font-mono)",
+            fontSize: 13,
+            color: "var(--signal)",
+            lineHeight: 1.8,
+            whiteSpace: "pre-wrap",
+            textAlign: "left",
+            boxShadow: "var(--shadow-md)",
+            transition: "opacity 0.4s ease-out, transform 0.4s ease-out",
+            opacity: done ? 0 : 1,
+            transform: done ? "scale(0.97)" : "scale(1)",
+          }}
+        >
+          {typed}
+          <span style={{ opacity: 0.6 }}>▊</span>
+        </div>
+      )}
+      {phase === "content" && (
+        <div style={{ maxWidth: 760 }}>
+          <HeroStagger>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                background: "var(--signal-light)",
+                border: "1px solid var(--signal-border)",
+                borderRadius: "var(--r-full)",
+                padding: "5px 14px 5px 10px",
+              }}
+            >
+              <span
+                className="pm-pulse"
+                aria-hidden
+                style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--signal)" }}
+              />
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 12,
+                  color: "var(--signal)",
+                }}
+              >
+                Open to Staff · Principal roles
+              </span>
+            </span>
+
+            <h1
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                fontSize: "clamp(3rem, 8vw, 6rem)",
+                color: "var(--ink-primary)",
+                lineHeight: 1.05,
+                margin: "24px 0 16px",
+                fontWeight: 400,
+              }}
+            >
+              Amit Chakraborty
+            </h1>
+
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 13,
+                color: "var(--ink-tertiary)",
+                letterSpacing: "0.05em",
+                marginBottom: 20,
+              }}
+            >
+              Principal Architect <span style={{ color: "var(--signal)" }}>·</span> AI-Native{" "}
+              <span style={{ color: "var(--signal)" }}>·</span> React{" "}
+              <span style={{ color: "var(--signal)" }}>·</span> Next.js{" "}
+              <span style={{ color: "var(--signal)" }}>·</span> mem0
+            </div>
+
+            <p
+              style={{
+                fontSize: 18,
+                color: "var(--ink-secondary)",
+                maxWidth: 520,
+                margin: "0 auto 36px",
+                lineHeight: 1.5,
+              }}
+            >
+              8+ years. 18+ production apps. 21 engineers led. 50K+ peak DAU.
+            </p>
+
+            <div
+              style={{
+                display: "flex",
+                gap: 0,
+                justifyContent: "center",
+                marginBottom: 36,
+                flexWrap: "wrap",
+              }}
+            >
+              {stats.map((s, i) => (
+                <div
+                  key={s.l}
+                  style={{
+                    padding: "0 32px",
+                    borderLeft: i === 0 ? "none" : "1px solid var(--edge-default)",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontFamily: "var(--font-serif)",
+                      fontStyle: "italic",
+                      fontSize: 40,
+                      color: "var(--ink-primary)",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {s.v}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 11,
+                      color: "var(--ink-tertiary)",
+                      letterSpacing: "0.08em",
+                      marginTop: 8,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {s.l}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <a
+                href="#work"
+                style={{
+                  background: "var(--signal)",
+                  color: "white",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  padding: "12px 24px",
+                  borderRadius: "var(--r-md)",
+                  textDecoration: "none",
+                  transition: "all 0.25s var(--ease)",
+                  display: "inline-block",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = "var(--shadow-signal)";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = "none";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                View My Work ↓
+              </a>
+              <a
+                href="mailto:amit@devamit.co.in"
+                style={{
+                  background: "transparent",
+                  border: "1px solid var(--edge-strong)",
+                  color: "var(--ink-secondary)",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 13,
+                  padding: "12px 20px",
+                  borderRadius: "var(--r-md)",
+                  textDecoration: "none",
+                  transition: "all 0.25s var(--ease)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "var(--edge-signal)";
+                  e.currentTarget.style.color = "var(--signal)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "var(--edge-strong)";
+                  e.currentTarget.style.color = "var(--ink-secondary)";
+                }}
+              >
+                amit@devamit.co.in ↗
+              </a>
+            </div>
+
+            <div
+              style={{
+                marginTop: 64,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 6,
+                opacity: 0,
+                animation: "pm-fade-in 0.6s var(--ease) 1.5s forwards",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 10,
+                  color: "var(--ink-tertiary)",
+                  letterSpacing: "0.15em",
+                  textTransform: "uppercase",
+                }}
+              >
+                scroll
+              </span>
+              <svg className="pm-bounce" width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M6 9l6 6 6-6" stroke="var(--ink-tertiary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          </HeroStagger>
+        </div>
+      )}
+      <style>{`@keyframes pm-fade-in { to { opacity: 1; } }`}</style>
+    </section>
+  );
+}
+
+function HeroStagger({ children }: { children: ReactNode }) {
+  // Apply staggered fade-up to direct children
+  return (
+    <div>
+      <style>{`
+        .hero-stagger > * { opacity: 0; transform: translateY(20px); animation: heroIn 0.6s var(--ease) forwards; }
+        @keyframes heroIn { to { opacity: 1; transform: translateY(0); } }
+        .hero-stagger > *:nth-child(1) { animation-delay: 0ms; }
+        .hero-stagger > *:nth-child(2) { animation-delay: 80ms; }
+        .hero-stagger > *:nth-child(3) { animation-delay: 160ms; }
+        .hero-stagger > *:nth-child(4) { animation-delay: 240ms; }
+        .hero-stagger > *:nth-child(5) { animation-delay: 320ms; }
+        .hero-stagger > *:nth-child(6) { animation-delay: 400ms; }
+        .hero-stagger > *:nth-child(7) { animation-delay: 480ms; }
+      `}</style>
+      <div className="hero-stagger">{children}</div>
+    </div>
+  );
+}
+
+/* ---------------- PHILOSOPHY ---------------- */
+
+function Philosophy() {
+  const cards = [
+    {
+      icon: "🧠",
+      title: "Memory-First Design",
+      body:
+        "Every UI I build considers state persistence and context retention across sessions. I think in memory graphs, not component trees. Mem0 is exactly that discipline.",
+    },
+    {
+      icon: "⚡",
+      title: "AI as Co-Pilot, Not Crutch",
+      body:
+        "I use Claude Code, Cursor, Codex, and Windsurf to accelerate, not replace judgment. My prompt logs show deliberate engineering decisions — not vibe-coding.",
+    },
+    {
+      icon: "🎯",
+      title: "End-to-End Ownership",
+      body:
+        "Design system → API integration → performance profiling → user feedback loops. Nothing ships from my hands unless it's complete, polished, and production-ready.",
+    },
+  ];
+  return (
+    <Section id="about">
+      <Label>{"[ memory.get({ entity: 'principles' }) ]"}</Label>
+      <h2
+        style={{
+          fontFamily: "var(--font-serif)",
+          fontSize: "clamp(2rem, 5vw, 3rem)",
+          margin: "8px 0 48px",
+          lineHeight: 1.1,
+          fontWeight: 400,
+        }}
+      >
+        <span style={{ fontStyle: "italic" }}>How I think</span> about building.
+      </h2>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+          gap: 16,
+        }}
+      >
+        {cards.map((c) => (
+          <article key={c.title} className="pm-card">
+            <div style={{ fontSize: 28, marginBottom: 12 }} aria-hidden>{c.icon}</div>
+            <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 10, color: "var(--ink-primary)" }}>
+              {c.title}
+            </h3>
+            <p style={{ color: "var(--ink-secondary)", lineHeight: 1.6, fontSize: 14 }}>{c.body}</p>
+          </article>
+        ))}
+      </div>
+      <style>{`
+        .pm-card {
+          background: var(--bg-surface);
+          border: 1px solid var(--edge-default);
+          border-radius: var(--r-lg);
+          padding: 28px;
+          box-shadow: var(--shadow-sm);
+          transition: all 0.3s var(--ease);
+        }
+        .pm-card:hover {
+          border-color: var(--edge-signal);
+          box-shadow: var(--shadow-signal);
+          transform: translateY(-3px);
+        }
+      `}</style>
+    </Section>
+  );
+}
+
+/* ---------------- SKILLS ---------------- */
+
+interface Skill { name: string; score: number; note: string }
+interface Cluster { id: string; label: string; color: string; ghost: string; skills: Skill[] }
+
+const CLUSTERS: Cluster[] = [
+  { id: "mobile", label: "mobile", color: "#0EA5E9", ghost: "rgba(14,165,233,0.08)", skills: [
+    { name: "React Native Bridgeless", score: 98, note: "JSI · Fabric · TurboModules" },
+    { name: "TypeScript Strict", score: 96, note: "Generics · discriminated unions" },
+    { name: "Reanimated 3", score: 92, note: "UI thread worklets · 60fps on $150 Android" },
+    { name: "iOS + Android Deploy", score: 95, note: "App Store · Play Store · Fastlane" },
+    { name: "C++ / Swift / Kotlin", score: 83, note: "Native modules · JSI bridge" },
+  ]},
+  { id: "ai", label: "ai_ml", color: "#8B5CF6", ghost: "rgba(139,92,246,0.08)", skills: [
+    { name: "mem0 SDK", score: 90, note: "This portfolio is proof" },
+    { name: "RAG Pipelines", score: 88, note: "HIPAA · 99.9% uptime · Pinecone" },
+    { name: "Claude / Gemini / OpenAI", score: 87, note: "Streaming · tool use · function calling" },
+    { name: "MediaPipe CV", score: 84, note: "BlazePose · <16ms on mobile" },
+    { name: "Context Engineering", score: 91, note: "Prompt architecture · memory injection" },
+  ]},
+  { id: "frontend", label: "frontend", color: "#16A07C", ghost: "rgba(22,160,124,0.08)", skills: [
+    { name: "React 18 / 19", score: 94, note: "Concurrent · Suspense · RSC" },
+    { name: "Next.js 15", score: 92, note: "App Router · ISR · Edge Runtime" },
+    { name: "Framer Motion", score: 87, note: "Spring physics · choreography" },
+    { name: "Zustand + React Query", score: 90, note: "The only state stack I need" },
+  ]},
+  { id: "backend", label: "backend", color: "#F59E0B", ghost: "rgba(245,158,11,0.08)", skills: [
+    { name: "NestJS", score: 90, note: "DI · guards · event-driven" },
+    { name: "PostgreSQL + PostGIS", score: 90, note: "ACID · geospatial · window fns" },
+    { name: "GraphQL", score: 88, note: "DataLoader · federation" },
+  ]},
+  { id: "web3", label: "web3", color: "#A78BFA", ghost: "rgba(167,139,250,0.08)", skills: [
+    { name: "Solidity", score: 85, note: "ERC-20/721/1155 · UUPS proxy" },
+    { name: "Wagmi v2 + Viem", score: 86, note: "Type-safe · multi-chain · SSR" },
+    { name: "Ethereum Mainnet", score: 81, note: "Gas optimization · on-chain game logic" },
+  ]},
+  { id: "leadership", label: "leadership", color: "#F472B6", ghost: "rgba(244,114,182,0.08)", skills: [
+    { name: "0→1 Architecture", score: 98, note: "5 complete systems from zero" },
+    { name: "Team Scaling", score: 94, note: "0→21 engineers · 3 seniors promoted" },
+    { name: "Technical Mentorship", score: 95, note: "Standards · reviews · culture" },
+  ]},
+];
+
+function SkillBar({ score, color, animate }: { score: number; color: string; animate: boolean }) {
+  return (
+    <div style={{ height: 3, background: "var(--bg-raised)", borderRadius: 2, overflow: "hidden", marginTop: 6 }}>
+      <div
+        style={{
+          height: "100%",
+          width: animate ? `${score}%` : "0%",
+          background: color,
+          opacity: 0.85,
+          transition: "width 0.7s ease-out",
+        }}
+      />
+    </div>
+  );
+}
+
+function ClusterCard({ cluster }: { cluster: Cluster }) {
+  const { ref, inView } = useInView<HTMLDivElement>(0.2);
+  return (
+    <div
+      ref={ref}
+      className="pm-card"
+      style={{ padding: 24, background: "var(--bg-surface)" }}
+    >
+      <div
+        style={{
+          display: "inline-block",
+          fontFamily: "var(--font-mono)",
+          fontSize: 11,
+          color: cluster.color,
+          background: cluster.ghost,
+          padding: "3px 10px",
+          borderRadius: "var(--r-full)",
+          marginBottom: 16,
+        }}
+      >
+        {cluster.label}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        {cluster.skills.map((s, i) => (
+          <div key={s.name} style={{ transitionDelay: `${i * 60}ms` }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
+              <span style={{ fontSize: 13, color: "var(--ink-primary)" }}>{s.name}</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: cluster.color }}>
+                {s.score}
+              </span>
+            </div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ink-tertiary)", marginTop: 2 }}>
+              {s.note}
+            </div>
+            <SkillBar score={s.score} color={cluster.color} animate={inView} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Skills() {
+  return (
+    <Section id="skills">
+      <Label>{"[ memory.getCategories() ]"}</Label>
+      <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(1.8rem, 4.5vw, 2.75rem)", margin: "8px 0 12px", fontWeight: 400 }}>
+        <span style={{ fontStyle: "italic" }}>Technical</span> memory index.
+      </h2>
+      <p style={{ color: "var(--ink-secondary)", fontSize: 16, marginBottom: 32, maxWidth: 600 }}>
+        Proficiency mapped as retrieval scores. Higher = faster recall under pressure.
+      </p>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: 16,
+        }}
+      >
+        {CLUSTERS.map((c) => <ClusterCard key={c.id} cluster={c} />)}
+      </div>
+    </Section>
+  );
+}
+
+/* ---------------- PROJECTS ---------------- */
+
+interface Project {
+  id: string; name: string; signal: string; tagline: string; category: string;
+  score: number; year: string; url: string; impact: string; stack: string[]; description: string;
+}
+
+const PROJECTS: Project[] = [
+  { id: "mem_001", name: "Aura Studio", signal: "#8B5CF6",
+    tagline: "Visual AI Orchestration Platform", category: "AI Infrastructure",
+    score: 0.98, year: "2025–2026", url: "https://aurastudio.devamit.co.in",
+    impact: "45+ node types · Live LLM pipelines",
+    stack: ["React 19", "React Flow", "Next.js", "Gemini API", "NestJS", "Zustand"],
+    description: "Nodal canvas where users drag, connect, and configure 45+ AI pipeline nodes in real time without glue code. Full streaming execution. Not a demo." },
+  { id: "mem_002", name: "KSHEM / ProLandly", signal: "#16A07C",
+    tagline: "Government Land Intelligence Platform", category: "GovTech · GIS",
+    score: 0.96, year: "2025–2026", url: "https://kshem.devamit.co.in",
+    impact: "20+ portals · Claude AI · PostGIS",
+    stack: ["Next.js 16", "React 19", "Claude API", "PostGIS", "Tailwind v4"],
+    description: "Core digital infrastructure for land governance. 20+ stakeholder portals. Embedded document AI via Claude. RERA compliance." },
+  { id: "mem_003", name: "HarmonyBloom", signal: "#F472B6",
+    tagline: "Encrypted AI Wellness — Telegram Mini App", category: "Consumer AI · TMA",
+    score: 0.94, year: "2024–2026", url: "https://harmonybloom.devamit.co.in",
+    impact: "AES-256-GCM · Dexie offline-first · Gemini AI",
+    stack: ["React 18", "Vite", "Supabase", "Dexie", "Framer Motion", "Gemini API"],
+    description: "Privacy-first wellness engine. Zero-knowledge architecture. Runs inside Telegram. AI coach with gamified habit tracking." },
+  { id: "mem_004", name: "Aura Arena", signal: "#FB923C",
+    tagline: "Real-time Computer Vision Gaming PWA", category: "Computer Vision · Gaming",
+    score: 0.93, year: "2024–2025", url: "https://auraarena.devamit.co.in",
+    impact: "<16ms inference · 60fps · Supabase Realtime",
+    stack: ["MediaPipe", "TensorFlow.js", "WebGPU", "Supabase Realtime", "PWA"],
+    description: "Live camera → competitive gameplay. BlazePose + Face Mesh at 60fps on consumer hardware. 1v1 battle mode. Global leaderboard." },
+  { id: "mem_005", name: "Vulcan Eleven", signal: "#38BDF8",
+    tagline: "Fantasy Sports · 50K+ Daily Active Users", category: "React Native · Mobile",
+    score: 0.95, year: "2023–2025", url: "https://apps.apple.com/app/vulcan-eleven/id6462420052",
+    impact: "50K+ DAU · C++ native · Razorpay + Binance Pay",
+    stack: ["React Native", "Reanimated 3", "C++", "Razorpay", "Binance Pay"],
+    description: "Fantasy sports at scale. C++ native modules for 60fps on $150 Android. Gesture mechanics, dual payment rails, zero critical failures in production." },
+  { id: "mem_006", name: "DeFi11", signal: "#A78BFA",
+    tagline: "Fully On-Chain Decentralized Fantasy Sports", category: "Web3 · Solidity",
+    score: 0.91, year: "2022–2024", url: "https://apps.apple.com/app/defi11-fantasy-sports-app/id1608967244",
+    impact: "Ethereum Mainnet · UUPS proxy · NFT marketplace",
+    stack: ["Solidity", "React Native", "Wagmi", "Ethers.js", "ERC-721"],
+    description: "100% on-chain. Smart contract prize pools. NFT marketplace with ERC-2981 royalties. Zero-trust — no centralized game logic." },
+];
+
+function ProjectCard({ p }: { p: Project }) {
+  const { ref, inView } = useInView<HTMLAnchorElement>(0.18);
+  const visibleStack = p.stack.slice(0, 4);
+  const overflow = p.stack.length - visibleStack.length;
+  return (
+    <a
+      ref={ref}
+      href={p.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="proj-card"
+      style={{
+        position: "relative",
+        background: "var(--bg-surface)",
+        border: "1px solid var(--edge-default)",
+        borderRadius: "var(--r-lg)",
+        padding: 24,
+        textDecoration: "none",
+        color: "inherit",
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+        overflow: "hidden",
+        transition: "all 0.3s var(--ease)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-4px)";
+        e.currentTarget.style.boxShadow = `0 8px 32px ${p.signal}26`;
+        e.currentTarget.style.borderColor = `${p.signal}66`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "none";
+        e.currentTarget.style.borderColor = "var(--edge-default)";
+      }}
+    >
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: p.signal }} />
+      <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-mono)", fontSize: 10 }}>
+        <span style={{ color: "var(--ink-tertiary)" }}>{p.id}</span>
+        <span style={{ color: p.signal }}>{p.score.toFixed(2)}</span>
+      </div>
+      <div style={{ height: 2, background: "var(--bg-raised)", borderRadius: 1, overflow: "hidden" }}>
+        <div style={{
+          height: "100%",
+          width: inView ? `${p.score * 100}%` : "0%",
+          background: p.signal,
+          transition: "width 0.8s ease-out",
+        }} />
+      </div>
+      <div>
+        <span style={{
+          display: "inline-block",
+          background: `${p.signal}1a`,
+          border: `1px solid ${p.signal}40`,
+          color: p.signal,
+          fontFamily: "var(--font-mono)",
+          fontSize: 10,
+          padding: "3px 10px",
+          borderRadius: "var(--r-full)",
+        }}>{p.category}</span>
+      </div>
+      <div>
+        <h3 style={{ fontSize: 18, fontWeight: 600, color: "var(--ink-primary)", marginBottom: 4 }}>{p.name}</h3>
+        <div style={{ fontSize: 13, color: "var(--ink-secondary)" }}>{p.tagline}</div>
+      </div>
+      <p style={{ fontSize: 13, color: "var(--ink-secondary)", lineHeight: 1.5 }}>{p.description}</p>
+      <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: p.signal }}>→ {p.impact}</div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {visibleStack.map((s) => (
+          <span key={s} style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 10,
+            color: "var(--ink-tertiary)",
+            background: "var(--bg-raised)",
+            border: "1px solid var(--edge-subtle)",
+            padding: "3px 8px",
+            borderRadius: "var(--r-xs)",
+          }}>{s}</span>
+        ))}
+        {overflow > 0 && (
+          <span style={{
+            fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ink-tertiary)",
+            background: "var(--bg-raised)", padding: "3px 8px", borderRadius: "var(--r-xs)",
+          }}>+{overflow} more</span>
+        )}
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "auto", paddingTop: 8 }}>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ink-tertiary)" }}>{p.year}</span>
+        <span style={{ color: "var(--ink-tertiary)", fontSize: 12 }} aria-hidden>↗</span>
+      </div>
+    </a>
+  );
+}
+
+function Projects() {
+  return (
+    <Section id="work">
+      <Label>{"[ memory.search({ category: 'shipped_work' }) ]"}</Label>
+      <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2rem, 5vw, 3rem)", margin: "8px 0 12px", fontWeight: 400 }}>
+        <span style={{ fontStyle: "italic" }}>Shipped systems,</span>{" "}
+        <span style={{ color: "var(--ink-secondary)" }}>not side projects.</span>
+      </h2>
+      <p style={{ color: "var(--ink-secondary)", fontSize: 16, marginBottom: 32 }}>
+        6 of 18+ production systems. Each had real users. Real stakes.
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+        {PROJECTS.map((p) => <ProjectCard key={p.id} p={p} />)}
+      </div>
+    </Section>
+  );
+}
+
+/* ---------------- DEMO ---------------- */
+
+const QUICK_FILL = [
+  "I prefer TypeScript over JavaScript",
+  "I'm a startup founder in India",
+  "I love minimal light mode UIs",
+];
+
+function syntaxHighlight(code: string) {
+  // Token-based simple highlight
+  const out: ReactNode[] = [];
+  const lines = code.split("\n");
+  lines.forEach((line, li) => {
+    const parts: ReactNode[] = [];
+    let idx = 0;
+    const re = /("[^"]*")|(\bawait\b)|(\.[a-zA-Z_]+)|(\bconst\b|\blet\b|\bnew\b)|(\bclient\b|\bmem0\b)|(\{|\}|\[|\])/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(line)) !== null) {
+      if (m.index > idx) parts.push(line.slice(idx, m.index));
+      const text = m[0];
+      let color = "#F0F0FF";
+      if (m[1]) color = "#FB923C";
+      else if (m[2]) color = "#16A07C";
+      else if (m[3]) color = "#8B5CF6";
+      else if (m[4]) color = "#16A07C";
+      else if (m[5]) color = "#F0F0FF";
+      else if (m[6]) color = "#9CA3AF";
+      parts.push(<span key={`${li}-${m.index}`} style={{ color }}>{text}</span>);
+      idx = m.index + text.length;
+    }
+    if (idx < line.length) parts.push(line.slice(idx));
+    out.push(<div key={li}>{parts.length ? parts : "\u00A0"}</div>);
+  });
+  return out;
+}
+
+function Demo({ visitorId, showToast }: { visitorId: string; showToast: (m: string) => void }) {
+  const [input, setInput] = useState("");
+  const [memories, setMemories] = useState<MemoryEntry[]>([]);
+  const [results, setResults] = useState<MemorySearchResult[] | null>(null);
+  const [loading, setLoading] = useState<"add" | "search" | null>(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQ, setSearchQ] = useState("");
+  const [code, setCode] = useState<string>(
+    `await mem0.add(\n  [{ role: "user", content: "..." }],\n  { user_id: "${visitorId}" }\n);`,
+  );
+
+  const onAdd = useCallback(async () => {
+    if (!input.trim()) return;
+    setLoading("add");
+    setCode(
+      `await mem0.add(\n  [{ role: "user", content: "${input.replace(/"/g, '\\"')}" }],\n  { user_id: "${visitorId}" }\n);`,
+    );
+    const entry = await mem0.add(
+      [{ role: "user", content: input }],
+      { user_id: visitorId, metadata: { source: "portfolio_demo" } },
+    );
+    setMemories((prev) => [entry, ...prev]);
+    setResults(null);
+    setInput("");
+    setLoading(null);
+    showToast("Memory stored");
+  }, [input, visitorId, showToast]);
+
+  const onSearch = useCallback(async () => {
+    setLoading("search");
+    setCode(
+      `await mem0.search(\n  "${searchQ.replace(/"/g, '\\"')}",\n  { filters: { user_id: "${visitorId}" } }\n);`,
+    );
+    const res = await mem0.search(searchQ || "*", { filters: { user_id: visitorId } });
+    setResults(res);
+    setLoading(null);
+  }, [searchQ, visitorId]);
+
+  const onDelete = useCallback(async (id: string) => {
+    await mem0.delete(id);
+    setMemories((prev) => prev.filter((m) => m.id !== id));
+    setResults((prev) => (prev ? prev.filter((m) => m.id !== id) : null));
+    setCode(`await mem0.delete("${id}");`);
+  }, []);
+
+  const matchedIds = useMemo(() => new Set((results ?? []).map((r) => r.id)), [results]);
+  const scoreById = useMemo(() => {
+    const m = new Map<string, string>();
+    (results ?? []).forEach((r) => m.set(r.id, r.score));
+    return m;
+  }, [results]);
+
+  return (
+    <Section id="demo">
+      <Label>{"[ mem0.playground({ live: true }) ]"}</Label>
+      <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2rem, 5vw, 3rem)", margin: "8px 0 12px", fontWeight: 400 }}>
+        <span style={{ fontStyle: "italic" }}>Memory</span> in action.
+      </h2>
+      <p style={{ color: "var(--ink-secondary)", fontSize: 16, marginBottom: 32, maxWidth: 640 }}>
+        This demo runs the real mem0 API surface. Add memories. Search them. Watch the retrieval scores.
+        This is what I would build for your users.
+      </p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
+        {/* LEFT */}
+        <div style={{
+          background: "var(--bg-surface)",
+          border: "1px solid var(--edge-default)",
+          borderTop: "3px solid var(--signal)",
+          borderRadius: "var(--r-lg)",
+          padding: 24,
+          display: "flex", flexDirection: "column", gap: 14,
+        }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--signal)" }}>
+            mem0 · add()
+          </div>
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Tell me something about you..."
+            aria-label="Memory content"
+            style={{
+              background: "var(--bg-raised)",
+              border: "1px solid var(--edge-default)",
+              borderRadius: "var(--r-md)",
+              padding: 12,
+              fontFamily: "var(--font-sans)",
+              fontSize: 14,
+              minHeight: 80,
+              resize: "vertical",
+              color: "var(--ink-primary)",
+              outline: "none",
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = "var(--signal)"; e.currentTarget.style.boxShadow = "var(--signal-glow)"; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = "var(--edge-default)"; e.currentTarget.style.boxShadow = "none"; }}
+          />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {QUICK_FILL.map((q) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => setInput(q)}
+                style={{
+                  background: "var(--signal-light)",
+                  border: "1px solid var(--signal-border)",
+                  color: "var(--signal)",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
+                  padding: "5px 12px",
+                  borderRadius: "var(--r-full)",
+                  cursor: "pointer",
+                }}
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button
+              type="button"
+              onClick={onAdd}
+              disabled={loading === "add" || !input.trim()}
+              style={{
+                background: "var(--signal)", color: "white",
+                fontFamily: "var(--font-sans)", fontSize: 14, fontWeight: 600,
+                padding: "10px 18px", borderRadius: "var(--r-md)", border: "none",
+                cursor: loading === "add" ? "wait" : "pointer", opacity: loading === "add" ? 0.7 : 1,
+              }}
+            >
+              {loading === "add" ? "Storing..." : "Store Memory"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowSearch((s) => !s)}
+              style={{
+                background: "transparent", border: "1px solid var(--edge-strong)",
+                color: "var(--ink-secondary)", fontFamily: "var(--font-mono)", fontSize: 13,
+                padding: "10px 16px", borderRadius: "var(--r-md)", cursor: "pointer",
+              }}
+            >
+              Search Memory
+            </button>
+          </div>
+
+          {showSearch && (
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                value={searchQ}
+                onChange={(e) => setSearchQ(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") onSearch(); }}
+                placeholder="Search stored memories..."
+                aria-label="Search query"
+                style={{
+                  flex: 1, background: "var(--bg-raised)",
+                  border: "1px solid var(--edge-default)", borderRadius: "var(--r-md)",
+                  padding: "10px 12px", fontSize: 14, outline: "none",
+                }}
+              />
+              <button
+                type="button" onClick={onSearch}
+                style={{
+                  background: "var(--ink-primary)", color: "white", fontSize: 13,
+                  padding: "10px 16px", borderRadius: "var(--r-md)", border: "none", cursor: "pointer",
+                }}
+              >Run</button>
+            </div>
+          )}
+
+          {/* code preview */}
+          <div style={{
+            background: "#1A1D23", borderRadius: "var(--r-md)", padding: 16,
+            fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.7,
+            color: "#9CA3AF", overflow: "auto", whiteSpace: "pre",
+          }}>
+            {loading ? (
+              <span style={{ color: "var(--signal)" }}>
+                <span className="pm-pulse" style={{ display: "inline-block", width: 8, height: 8, background: "var(--signal)", borderRadius: "50%", marginRight: 8 }} />
+                Processing with Mem0...
+              </span>
+            ) : syntaxHighlight(code)}
+          </div>
+        </div>
+
+        {/* RIGHT */}
+        <div style={{
+          background: "var(--bg-surface)",
+          border: "1px solid var(--edge-default)",
+          borderRadius: "var(--r-lg)",
+          padding: 24,
+          display: "flex", flexDirection: "column", gap: 14, minHeight: 360,
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>Stored Memories</div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ink-tertiary)" }}>
+                user_id: {visitorId}
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{
+                background: "var(--signal-light)", color: "var(--signal)",
+                fontFamily: "var(--font-mono)", fontSize: 11,
+                padding: "3px 10px", borderRadius: "var(--r-full)",
+              }}>{memories.length} {memories.length === 1 ? "Memory" : "Memories"}</span>
+              <span aria-hidden style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--signal)" }}>
+                <span className="pm-pulse" style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--signal)" }} />
+                Connected
+              </span>
+            </div>
+          </div>
+
+          {memories.length === 0 ? (
+            <div style={{
+              border: "2px dashed var(--edge-signal)", borderRadius: "var(--r-md)",
+              padding: 40, textAlign: "center", color: "var(--ink-tertiary)",
+              flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10,
+            }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M12 2a4 4 0 00-4 4v1a4 4 0 00-2 7.5V17a3 3 0 003 3h6a3 3 0 003-3v-2.5A4 4 0 0016 7V6a4 4 0 00-4-4z" stroke="var(--signal)" strokeWidth="1.5" />
+              </svg>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>No memories yet.</div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 12 }}>Start typing to watch Mem0 extract and store context.</div>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, overflowY: "auto", maxHeight: 480 }}>
+              {results && (
+                <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--signal)" }}>
+                  Relevance ↓
+                </div>
+              )}
+              {memories.map((m) => {
+                const isMatch = !results || matchedIds.has(m.id);
+                const score = scoreById.get(m.id);
+                const color = CATEGORY_COLORS[m.category as MemoryCategory];
+                return (
+                  <div key={m.id} className="pm-slide-in" style={{
+                    background: "var(--bg-raised)", border: "1px solid var(--edge-subtle)",
+                    borderRadius: "var(--r-md)", padding: "12px 14px",
+                    opacity: isMatch ? 1 : 0.4, transition: "opacity 0.3s",
+                    position: "relative",
+                  }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, gap: 8 }}>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ink-tertiary)" }}>
+                        {m.id.slice(0, 12)}
+                      </span>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{
+                          background: `${color}1a`, color, fontFamily: "var(--font-mono)", fontSize: 10,
+                          padding: "2px 8px", borderRadius: "var(--r-full)",
+                        }}>{m.category}</span>
+                        <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ink-tertiary)" }}>
+                          {timeAgo(m.created_at)}
+                        </span>
+                        <button
+                          type="button"
+                          aria-label="Delete memory"
+                          onClick={() => onDelete(m.id)}
+                          style={{
+                            background: "transparent", border: "none", cursor: "pointer",
+                            color: "var(--ink-tertiary)", fontSize: 16, lineHeight: 1, padding: 0,
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = "#DC2626")}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-tertiary)")}
+                        >×</button>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 14, color: "var(--ink-primary)", lineHeight: 1.5 }}>{m.memory}</div>
+                    {score && (
+                      <div style={{ marginTop: 8 }}>
+                        <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--signal)", marginBottom: 3 }}>
+                          Score: {score}
+                        </div>
+                        <div style={{ height: 3, background: "var(--bg-overlay)", borderRadius: 2, overflow: "hidden" }}>
+                          <div style={{
+                            height: "100%",
+                            width: `${Number(score) * 100}%`,
+                            background: "var(--signal)",
+                            transition: "width 0.4s ease-out",
+                          }} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+function timeAgo(iso: string): string {
+  const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (diff < 60) return `${Math.max(1, Math.floor(diff))}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  return `${Math.floor(diff / 3600)}h ago`;
+}
+
+/* ---------------- LOGS ---------------- */
+
+interface TermLog {
+  tool: string; date: string; filename: string; prompt: string; output: string;
+}
+
+const LOGS: TermLog[] = [
+  {
+    tool: "Claude Code", date: "April 12, 2025 · 2:34 PM", filename: "useMemory.ts",
+    prompt: `// Prompt: "Building a chat interface that persists conversation context using mem0.
+// The user should feel the AI remembers them on return visits.
+// Design: memory schema, React state architecture, and mem0 integration layer.
+// Q: What to store vs retrieve? How to handle memory conflicts?
+//    What's the retrieval strategy for context injection?"`,
+    output: `> Files modified: /hooks/useMemory.ts · /lib/mem0Client.ts · /components/ChatContext.tsx
+> Tokens: 4,847  |  Time saved: ~3.5 hours  |  Bugs caught before PR: 2`,
+  },
+  {
+    tool: "Cursor", date: "March 28, 2025 · 11:15 AM", filename: "Dashboard.tsx → 4 hooks",
+    prompt: `// "Dashboard component violates SRP — it fetches data, manages WebSocket,
+// renders charts, AND handles user preferences.
+// Extract: useMetrics(), useRealtimeUpdates(), useUserConfig().
+// TypeScript strict — no \`any\` allowed. Justify every type decision."`,
+    output: `> Generated: useMetrics.ts · useRealtimeUpdates.ts · useUserConfig.ts · useChartData.ts
+> LOC: 847 generated, 312 written manually
+> Duration: 23 min  |  Estimated manual: 6 hours`,
+  },
+  {
+    tool: "Windsurf", date: "May 2, 2025 · 4:02 PM", filename: "MemoryClient.test.ts",
+    prompt: `// "Generate Vitest unit tests for MockMemoryClient.
+// Cover: add/search/delete happy paths, API errors (401, 429, 500),
+// network timeouts, concurrent operations, edge cases:
+// empty queries, duplicate memories, special chars in user_id.
+// vi.mock the fetch layer."`,
+    output: `> Test cases: 47 generated  |  Coverage: 94% → 98%
+> Bugs caught before production: 3 edge cases in concurrent deletes`,
+  },
+];
+
+function Terminal({ log }: { log: TermLog }) {
+  return (
+    <div style={{
+      background: "#1A1D23", borderRadius: "var(--r-lg)", overflow: "hidden",
+      boxShadow: "var(--shadow-md)",
+    }}>
+      <div style={{
+        background: "#14161C", padding: "10px 16px",
+        display: "flex", alignItems: "center", gap: 8,
+      }}>
+        <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#FF5F57" }} />
+        <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#FEBC2E" }} />
+        <span style={{ width: 12, height: 12, borderRadius: "50%", background: "#28C840" }} />
+        <span style={{ marginLeft: "auto", fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--ink-tertiary)" }}>
+          {log.filename}
+        </span>
+      </div>
+      <div style={{
+        padding: "20px 24px", fontFamily: "var(--font-mono)", fontSize: 13,
+        lineHeight: 1.9, color: "#9CA3AF", whiteSpace: "pre-wrap", overflowX: "auto",
+      }}>
+        <div style={{ color: "var(--signal)", fontSize: 11, marginBottom: 12 }}>
+          {log.tool} · {log.date}
+        </div>
+        <div style={{ color: "#4B5563" }}>{log.prompt}</div>
+        <div style={{ marginTop: 12, color: "#F0F0FF" }}>{log.output}</div>
+      </div>
+    </div>
+  );
+}
+
+function Logs() {
+  return (
+    <Section id="logs">
+      <Label>{"[ memory.search({ category: 'ai_workflow' }) ]"}</Label>
+      <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(1.8rem, 4.5vw, 2.75rem)", margin: "8px 0 12px", fontWeight: 400 }}>
+        <span style={{ fontStyle: "italic" }}>How I actually</span> build.
+      </h2>
+      <p style={{ color: "var(--ink-secondary)", fontSize: 16, marginBottom: 32, maxWidth: 640 }}>
+        Not 'I used AI'. Deliberate, logged, reviewable engineering decisions.
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {LOGS.map((l) => <Terminal key={l.filename} log={l} />)}
+      </div>
+    </Section>
+  );
+}
+
+/* ---------------- CONTACT ---------------- */
+
+function Contact({ showToast }: { showToast: (m: string) => void }) {
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText("amit@devamit.co.in");
+      showToast("Copied!");
+    } catch {
+      showToast("Press Cmd/Ctrl+C");
+    }
+  };
+
+  const finalCode = `// What Amit ships from day one
+await mem0.add([
+  { role: "engineer", content: "Polished production UIs, end-to-end" },
+  { role: "engineer", content: "AI-native workflow — Claude Code, Cursor, Windsurf" },
+  { role: "engineer", content: "mem0 SDK integrated before the first interview" },
+  { role: "engineer", content: "8 years of shipped systems. No unfinished work." }
+], { user_id: "mem0_team", metadata: { status: "open_to_hire" } });
+
+// { id: "mem_amit_001", score: 0.99, category: "hire_now" }`;
+
+  return (
+    <div id="contact" style={{ background: "var(--bg-raised)", borderTop: "1px solid var(--edge-default)" }}>
+      <Section id="contact-inner">
+        <Label>{"[ mem0.add({ user_id: 'mem0_team', content: 'Amit is available' }) ]"}</Label>
+        <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(2rem, 5vw, 3rem)", margin: "8px 0 16px", fontWeight: 400 }}>
+          <span style={{ fontStyle: "italic" }}>Let's build memory</span> together.
+        </h2>
+        <p style={{ color: "var(--ink-secondary)", fontSize: 16, marginBottom: 32, maxWidth: 640 }}>
+          I've studied the SDK. I've built the demo. I've shipped the logs. Here's how to reach me.
+        </p>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 24, marginBottom: 32 }}>
+          <button type="button" onClick={copyEmail} className="contact-link" style={contactLinkStyle}>
+            ✉ amit@devamit.co.in
+          </button>
+          <a href="https://github.com/devamitch" target="_blank" rel="noopener noreferrer" className="contact-link" style={contactLinkStyle}>
+            ◐ github.com/devamitch
+          </a>
+          <a href="https://linkedin.com/in/devamitch" target="_blank" rel="noopener noreferrer" className="contact-link" style={contactLinkStyle}>
+            ⌗ linkedin.com/in/devamitch
+          </a>
+          <a href="https://x.com/devamitch" target="_blank" rel="noopener noreferrer" className="contact-link" style={contactLinkStyle}>
+            𝕏 x.com/devamitch
+          </a>
+        </div>
+
+        <a
+          href="https://app.dover.com/apply/Recruitingbond/f73ca394-3c9a-4f82-a7e2-4d63a26a6081"
+          target="_blank" rel="noopener noreferrer"
+          style={{
+            display: "inline-block", background: "var(--signal)", color: "white",
+            fontSize: 15, fontWeight: 600, padding: "14px 32px",
+            borderRadius: "var(--r-md)", textDecoration: "none",
+            transition: "all 0.25s var(--ease)", marginBottom: 40,
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "var(--shadow-signal)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "translateY(0)"; }}
+        >
+          Apply to Mem0 →
+        </a>
+
+        <Terminal log={{
+          tool: "amit.contribution", date: "ready", filename: "amit.contribution.js",
+          prompt: finalCode, output: "",
+        }} />
+      </Section>
+      <style>{`
+        .contact-link { transition: color 0.2s; }
+        .contact-link:hover { color: var(--signal) !important; }
+      `}</style>
+    </div>
+  );
+}
+
+const contactLinkStyle: React.CSSProperties = {
+  background: "transparent",
+  border: "none",
+  padding: 0,
+  fontFamily: "var(--font-mono)",
+  fontSize: 13,
+  color: "var(--ink-secondary)",
+  textDecoration: "none",
+  cursor: "pointer",
+};
+
+/* ---------------- MEMORY BANNER ---------------- */
+
+function MemoryBanner() {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const visitsRaw = localStorage.getItem("portfolio_visit_count");
+      const dismissed = sessionStorage.getItem("portfolio_banner_dismissed");
+      const count = visitsRaw ? parseInt(visitsRaw, 10) : 0;
+      localStorage.setItem("portfolio_visit_count", String(count + 1));
+      if (count > 0 && !dismissed) setShow(true);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  if (!show) return null;
+  return (
+    <div className="pm-slide-down" style={{
+      position: "sticky", top: 56, zIndex: 90,
+      background: "var(--signal-light)", borderBottom: "1px solid var(--signal-border)",
+      height: 40, padding: "0 24px",
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+    }}>
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--signal)" }}>
+        [ memory recalled ] · Welcome back. You've been here before.
+      </span>
+      <button
+        type="button"
+        aria-label="Dismiss banner"
+        onClick={() => {
+          try { sessionStorage.setItem("portfolio_banner_dismissed", "1"); } catch { /* ignore */ }
+          setShow(false);
+        }}
+        style={{ background: "transparent", border: "none", color: "var(--signal)", cursor: "pointer", fontSize: 18, lineHeight: 1 }}
+      >×</button>
+    </div>
+  );
+}
+
+/* ---------------- ROOT ---------------- */
+
+export function Portfolio() {
+  const visitorId = useMemo(() => {
+    if (typeof window === "undefined") return "visitor_ssr000";
+    try {
+      const existing = localStorage.getItem("portfolio_visitor_id");
+      if (existing) return existing;
+      const id = "visitor_" + Math.random().toString(36).slice(2, 7);
+      localStorage.setItem("portfolio_visitor_id", id);
+      return id;
+    } catch {
+      return "visitor_" + Math.random().toString(36).slice(2, 7);
+    }
+  }, []);
+
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showToast = useCallback((m: string) => {
+    setToast(m);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 2000);
+  }, []);
+
+  return (
+    <div style={{ background: "var(--bg-page)", color: "var(--ink-primary)", minHeight: "100vh" }}>
+      <Nav />
+      <MemoryBanner />
+      <main>
+        <Hero />
+        <Philosophy />
+        <Skills />
+        <Projects />
+        <Demo visitorId={visitorId} showToast={showToast} />
+        <Logs />
+      </main>
+      <Contact showToast={showToast} />
+      <footer style={{
+        background: "var(--bg-raised)", padding: "32px 24px",
+        textAlign: "center", fontFamily: "var(--font-mono)",
+        fontSize: 11, color: "var(--ink-tertiary)",
+        borderTop: "1px solid var(--edge-subtle)",
+      }}>
+        // built with mem0 · {new Date().getFullYear()} · Kolkata → Remote
+      </footer>
+      <Toast message={toast} />
+      <style>{`
+        @media (max-width: 720px) {
+          .hide-on-mobile { display: none !important; }
+          section { padding-top: 64px !important; padding-bottom: 64px !important; }
+        }
+      `}</style>
+    </div>
+  );
+}
