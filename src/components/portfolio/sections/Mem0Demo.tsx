@@ -5,6 +5,7 @@ import {
   addMemoryFn,
   searchMemoryFn,
   deleteMemoryFn,
+  scoreMemoryFn,
   type MemoryResult,
 } from "@/lib/api/memory.functions";
 import { Section } from "../ui/Section";
@@ -72,6 +73,9 @@ export function Mem0Demo({
   const [memories, setMemories] = useState<MemoryResult[]>([]);
   const [results, setResults] = useState<(MemoryResult & { score: string })[] | null>(null);
   const [loading, setLoading] = useState<"add" | "search" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [scoringId, setScoringId] = useState<string | null>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQ, setSearchQ] = useState("");
   const [apiMode, setApiMode] = useState<"real" | "mock" | null>(null);
@@ -82,6 +86,7 @@ export function Mem0Demo({
   const onAdd = useCallback(async () => {
     if (!input.trim()) return;
     setLoading("add");
+    setError(null);
     setCode(
       `await mem0.add(\n  [{ role: "user", content: "${input.replace(/"/g, '\\"')}" }],\n  { user_id: "${visitorId}" }\n);`,
     );
@@ -92,19 +97,24 @@ export function Mem0Demo({
           user_id: visitorId,
           metadata: { source: "portfolio_demo" },
         },
-      })) as { success: boolean; data?: MemoryResult; apiMode: "real" | "mock" };
+      })) as { success: boolean; data?: MemoryResult; apiMode: "real" | "mock"; error?: string };
       if (res.success && res.data) {
         setMemories((prev) => [res.data!, ...prev]);
         setApiMode(res.apiMode);
         showToast(res.apiMode === "real" ? "Memory stored via mem0 API" : "Memory stored (local)");
+      } else {
+        setApiMode(res.apiMode);
+        setError(res.error ?? "mem0 could not store this memory.");
+        showToast("mem0 add failed");
       }
-    } catch {
+    } catch (err) {
       const entry = await mockMem0.add([{ role: "user", content: input }], {
         user_id: visitorId,
         metadata: { source: "portfolio_demo" },
       });
       setMemories((prev) => [entry as unknown as MemoryResult, ...prev]);
       setApiMode("mock");
+      setError(err instanceof Error ? err.message : null);
       showToast("Memory stored (local fallback)");
     }
     setResults(null);
@@ -114,27 +124,33 @@ export function Mem0Demo({
 
   const onSearch = useCallback(async () => {
     setLoading("search");
+    setError(null);
     setCode(
       `await mem0.search(\n  "${searchQ.replace(/"/g, '\\"')}",\n  { user_id: "${visitorId}" }\n);`,
     );
     try {
       const res = (await searchMemoryFn({
-        data: { query: searchQ || "*", user_id: visitorId },
+        data: { query: searchQ || "portfolio context", user_id: visitorId, topK: 8 },
       })) as {
         success: boolean;
         data?: (MemoryResult & { score: string })[];
         apiMode: "real" | "mock";
+        error?: string;
       };
       if (res.success && res.data) {
         setResults(res.data);
         setApiMode(res.apiMode);
+      } else {
+        setApiMode(res.apiMode);
+        setError(res.error ?? "mem0 search failed.");
       }
-    } catch {
+    } catch (err) {
       const res = await mockMem0.search(searchQ || "*", {
         filters: { user_id: visitorId },
       });
       setResults(res as (MemoryResult & { score: string })[]);
       setApiMode("mock");
+      setError(err instanceof Error ? err.message : null);
     }
     setLoading(null);
   }, [searchQ, visitorId]);
