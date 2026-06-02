@@ -5,7 +5,7 @@ import { PROJECTS, type Project } from '../data/projects';
 import { useInView } from '@/hooks/use-in-view';
 
 function ProjectCard({ p, onSelect }: { p: Project; onSelect: (p: Project) => void }) {
-  const { ref, isInView } = useInView(0.18);
+  const { ref, isInView } = useInView<HTMLDivElement>(0.18);
 
   return (
     <div

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 export function useInView<T extends HTMLElement = HTMLElement>(
   threshold = 0.12,
-): { ref: React.RefObject<T | null>; inView: boolean } {
+): { ref: React.RefObject<T | null>; inView: boolean; isInView: boolean } {
   const ref = useRef<T | null>(null);
   const [inView, setInView] = useState(false);
   const fired = useRef(false);
@@ -27,5 +27,5 @@ export function useInView<T extends HTMLElement = HTMLElement>(
     return () => obs.disconnect();
   }, [threshold]);
 
-  return { ref, inView };
+  return { ref, inView, isInView: inView };
 }
