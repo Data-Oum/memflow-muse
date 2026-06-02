@@ -18,7 +18,7 @@ function SkillBar({ score, color, isVisible }: { score: number; color: string; i
 }
 
 function ClusterCard({ cluster }: { cluster: Cluster }) {
-  const { ref, isInView } = useInView(0.2);
+  const { ref, isInView } = useInView<HTMLDivElement>(0.2);
 
   return (
     <div ref={ref} className="pm-card p-6 flex flex-col gap-5">

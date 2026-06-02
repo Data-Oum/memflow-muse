@@ -52,7 +52,7 @@ export function useSmoothScroll() {
       if (!link) return;
       const hash = link.getAttribute("href");
       if (!hash || hash === "#") return;
-      const destination = document.querySelector(hash);
+      const destination = document.querySelector<HTMLElement>(hash);
       if (!destination) return;
       event.preventDefault();
       lenisInstance?.scrollTo(destination, { offset: -72 });
