@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Toast } from "./ui/Toast";
 import { Nav } from "./sections/Nav";
 import { MemoryBanner } from "./sections/MemoryBanner";
