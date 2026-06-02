@@ -135,7 +135,21 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
   ];
 
   return (
-    <Section id="voice" eyebrow="// voice-chat-rag" title="Voice chat, grounded in mem0">
+    <Section id="voice">
+      <div style={{ marginBottom: 24 }}>
+        <Label>// voice-chat-rag</Label>
+        <h2
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "clamp(28px, 4vw, 44px)",
+            fontStyle: "italic",
+            margin: "8px 0 0",
+            color: "var(--ink-primary)",
+          }}
+        >
+          Voice chat, grounded in mem0
+        </h2>
+      </div>
       <div
         style={{
           display: "grid",
