@@ -13,16 +13,19 @@ import { ProjectModal } from "./sections/ProjectModal";
 import type { Project } from "./data/projects";
 
 export function Portfolio() {
-  const visitorId = useMemo(() => {
-    if (typeof window === "undefined") return "visitor_ssr000";
+  const [visitorId, setVisitorId] = useState("visitor_ssr000");
+  useEffect(() => {
     try {
       const existing = localStorage.getItem("portfolio_visitor_id");
-      if (existing) return existing;
+      if (existing) {
+        setVisitorId(existing);
+        return;
+      }
       const id = "visitor_" + Math.random().toString(36).slice(2, 7);
       localStorage.setItem("portfolio_visitor_id", id);
-      return id;
+      setVisitorId(id);
     } catch {
-      return "visitor_" + Math.random().toString(36).slice(2, 7);
+      setVisitorId("visitor_" + Math.random().toString(36).slice(2, 7));
     }
   }, []);
 
