@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Mic, MicOff, Send, Square, Volume2, VolumeX, Loader2 } from "lucide-react";
@@ -25,14 +25,29 @@ function getSR(): (new () => SR) | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
+const MIC_ERRORS: Record<string, string> = {
+  "not-allowed": "Microphone permission denied. Enable it in your browser's site settings, then retry.",
+  "service-not-allowed": "Voice input is blocked by your browser. Check site permissions.",
+  "no-speech": "Didn't catch that. Try speaking a bit louder.",
+  "audio-capture": "No microphone found. Plug one in and retry.",
+  "not-found": "No microphone detected on this device.",
+  "network": "Network error while transcribing. Check your connection and retry.",
+  "aborted": "Voice input was stopped.",
+  "not-supported": "Voice input isn't supported in this browser. Try Chrome, Edge or Safari.",
+};
+
+const STORAGE_KEY = "voicechat_history_v1";
+
 export function VoiceChat({ visitorId }: { visitorId: string }) {
-  const transport = useRef(new DefaultChatTransport({ api: "/api/chat" })).current;
+  const transport = useMemo(() => new DefaultChatTransport({ api: "/api/chat" }), []);
   const [input, setInput] = useState("");
+  const [interim, setInterim] = useState("");
   const [listening, setListening] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
   const [speakEnabled, setSpeakEnabled] = useState(false);
   const recRef = useRef<SR | null>(null);
   const spokenRef = useRef<Set<string>>(new Set());
+  const lastPromptRef = useRef<string>("");
 
   const { messages, sendMessage, status, error, stop, regenerate } = useChat({
     transport,
@@ -40,6 +55,32 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
   });
 
   const busy = status === "submitted" || status === "streaming";
+
+  /* Restore last 10 turns on mount (display-only; AI SDK manages its own state) */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      // hydration of useChat messages isn't supported across reloads; we just
+      // surface the last prompt so the user can re-send via "Retry last".
+      const arr = JSON.parse(raw) as { role: string; text: string }[];
+      const lastUser = [...arr].reverse().find((m) => m.role === "user");
+      if (lastUser) lastPromptRef.current = lastUser.text;
+    } catch { /* ignore */ }
+  }, []);
+
+  /* Persist messages (capped at 10) for state recovery */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const slim = messages.slice(-10).map((m) => ({
+        role: m.role,
+        text: m.parts.map((p) => (p.type === "text" ? p.text : "")).join(""),
+      }));
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
+    } catch { /* ignore quota */ }
+  }, [messages]);
 
   /* TTS — read newly finished assistant messages */
   useEffect(() => {
@@ -63,15 +104,34 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
   function send(text: string) {
     const t = text.trim();
     if (!t || busy) return;
+    lastPromptRef.current = t;
     setInput("");
+    setInterim("");
     void sendMessage({ text: t }, { body: { userId: visitorId } });
+  }
+
+  function stopAll() {
+    try { stop(); } catch { /* noop */ }
+    try { recRef.current?.abort(); } catch { /* noop */ }
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    setListening(false);
+  }
+
+  function retryLast() {
+    if (lastPromptRef.current && !busy) {
+      send(lastPromptRef.current);
+    } else {
+      regenerate();
+    }
   }
 
   async function toggleMic() {
     setMicError(null);
     const Ctor = getSR();
     if (!Ctor) {
-      setMicError("Voice input isn't supported in this browser. Try Chrome or Edge.");
+      setMicError(MIC_ERRORS["not-supported"]);
       return;
     }
     if (listening) {
@@ -80,13 +140,19 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
       return;
     }
     try {
-      // Request mic permission explicitly
       if (navigator.mediaDevices?.getUserMedia) {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         stream.getTracks().forEach((t) => t.stop());
       }
-    } catch {
-      setMicError("Microphone permission denied. Enable it in your browser settings.");
+    } catch (err) {
+      const name = (err as { name?: string })?.name ?? "";
+      if (name === "NotFoundError" || name === "OverconstrainedError") {
+        setMicError(MIC_ERRORS["not-found"]);
+      } else if (name === "NotAllowedError" || name === "SecurityError") {
+        setMicError(MIC_ERRORS["not-allowed"]);
+      } else {
+        setMicError("Couldn't access microphone. Check permissions and retry.");
+      }
       return;
     }
     const rec = new Ctor();
@@ -95,20 +161,22 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
     rec.lang = "en-US";
     let finalText = "";
     rec.onresult = (e) => {
-      let interim = "";
+      let live = "";
       for (let i = 0; i < e.results.length; i++) {
         const r = e.results[i];
         if (r.isFinal) finalText += r[0].transcript;
-        else interim += r[0].transcript;
+        else live += r[0].transcript;
       }
-      setInput((finalText + " " + interim).trim());
+      setInput(finalText.trim());
+      setInterim(live.trim());
     };
     rec.onerror = (e) => {
-      setMicError(e.error === "not-allowed" ? "Microphone permission denied." : `Voice error: ${e.error}`);
+      setMicError(MIC_ERRORS[e.error] ?? `Voice error: ${e.error}`);
       setListening(false);
     };
     rec.onend = () => {
       setListening(false);
+      setInterim("");
       if (finalText.trim()) send(finalText.trim());
     };
     recRef.current = rec;
@@ -117,6 +185,7 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
       rec.start();
     } catch {
       setListening(false);
+      setMicError("Couldn't start the microphone. Retry in a moment.");
     }
   }
 
@@ -159,7 +228,6 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
           border: "1px solid var(--edge-subtle)",
           borderRadius: "var(--r-lg)",
           padding: 20,
-          boxShadow: "var(--shadow-sm)",
         }}
       >
         {/* Controls */}
@@ -231,6 +299,23 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
               <Loader2 size={14} className="animate-spin" /> thinking…
             </div>
           )}
+          {listening && interim && (
+            <div
+              style={{
+                alignSelf: "flex-end",
+                maxWidth: "85%",
+                background: "var(--signal-light)",
+                color: "var(--signal)",
+                border: "1px dashed var(--signal-border)",
+                padding: "8px 12px",
+                borderRadius: 14,
+                fontSize: 13,
+                fontStyle: "italic",
+              }}
+            >
+              {interim}…
+            </div>
+          )}
         </div>
 
         {error && (
@@ -250,9 +335,10 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
             }}
           >
             <span>Something went wrong streaming the response.</span>
-            <button type="button" onClick={() => regenerate()} style={iconBtn(false)}>
-              Retry
-            </button>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button type="button" onClick={retryLast} style={iconBtn(false)}>Retry</button>
+              <button type="button" onClick={() => regenerate()} style={iconBtn(false)}>Regenerate</button>
+            </div>
           </div>
         )}
         {micError && (
@@ -317,7 +403,7 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
             }}
           />
           {busy ? (
-            <button type="button" onClick={() => stop()} style={iconBtn(true)}>
+            <button type="button" onClick={stopAll} style={iconBtn(true)}>
               <Square size={14} /> Stop
             </button>
           ) : (

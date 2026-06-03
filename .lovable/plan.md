@@ -1,59 +1,54 @@
-## Amit Chakraborty — Mem0 Portfolio
+## Plan: Premium polish + SEO/PWA/Voice/Mem0 hardening
 
-A pixel-perfect, light-themed, single-page portfolio targeting a Staff/Principal Frontend role at Mem0. Built on the existing TanStack Start template, with a live mock `mem0` client driving an interactive demo, animated scroll choreography, full SEO/AEO/GEO metadata, and installable PWA support.
+### 1. Visual polish pass (out-of-the-box premium)
+- Audit `styles.css` and all section components; strip non-essential shadows, gradients, and borders. Keep only structural separators (1px hairlines where required).
+- Refine typography scale: tighter tracking on display serif, larger hero, more whitespace, asymmetric grid in Projects.
+- Replace decorative shadows on cards with subtle background-tone shifts (`--bg-raised` vs `--bg-surface`).
+- Add a single restrained motion language: fade + 8px rise, 400ms cubic-bezier; remove competing GSAP/Framer animations.
+- Refine Nav into a floating pill with backdrop blur only on scroll.
+- Mem0Demo, VoiceChat, Logs panels: flat surfaces, mono labels, emerald only as semantic accent (success/active).
 
-### Visual direction — "Light Memory"
-- Premium editorial light theme: cool off-white page (`#F7F8FA`), white surfaces, emerald `#16A07C` signal accent.
-- Typography pair: **Instrument Serif** (italic display) + **Geist** (body) + **JetBrains Mono** (labels/code).
-- Motion language: `cubic-bezier(0.16, 1, 0.3, 1)` at 0.3s; cards lift `-3px` with signal glow on hover.
-- All tokens land in `src/styles.css` as CSS custom properties so Tailwind utilities + raw CSS both consume them.
+### 2. SEO / AEO / GEO validation
+- Move per-page meta into route `head()` (root keeps defaults only; remove `og:image` from root if present).
+- Add JSON-LD on `/`: `Person` + `WebSite` + `BreadcrumbList`.
+- Verify Open Graph + Twitter card tags (title, description, url, image, type).
+- Create `src/routes/sitemap[.]xml.ts` server route (replace any static sitemap).
+- Ensure `public/robots.txt` allows all + references sitemap at production domain.
+- Run `seo_chat--trigger_scan` after changes and surface findings.
 
-### Sections (single home route at `/`)
-1. **Sticky nav** — scroll-spy active dot, "Open to roles" emerald pill.
-2. **Hero** — terminal-typed intro (`mem0.search(...)`) → staggered fade-up of name, role, tagline, 3 stats, CTAs, animated scroll cue.
-3. **Philosophy** — 3 cards (Memory-First, AI Co-Pilot, End-to-End Ownership).
-4. **Skills bento** — 6 cluster cards with animated retrieval-score bars (IntersectionObserver triggered, once).
-5. **Projects** — 6 shipped systems with mem-ID, score bar, category pill, stack chips, hover lift.
-6. **Live mem0 demo** — two-panel: input + quick-fill chips + live code preview (dark) on the left, animated memory list with category pills, scores, slide-out delete on the right. Real `MockMem0Client` with `add` / `search` / `getAll` / `delete`, smart `extractMemory` + `detectCategory`.
-7. **AI workflow logs** — 3 terminal panels (Claude Code, Cursor, Windsurf) with syntax-colored prompt/output.
-8. **Contact** — copy-to-clipboard email with toast, social links, Apply-to-Mem0 CTA, final `amit.contribution.js` terminal block.
-- **Returning visitor banner** — localStorage-backed, slides in under nav on repeat visits.
+### 3. PWA polish
+- Redesign `public/offline.html` to match design system (serif headline, mono caption, emerald dot).
+- Add install-prompt component: capture `beforeinstallprompt`, show a dismissible chip in Nav after 20s on eligible devices, persist dismissal in localStorage.
+- Bump `CACHE_VERSION` in `sw.js` to invalidate stale shell.
 
-### Architecture
-- Replace `src/routes/index.tsx` placeholder with the full portfolio.
-- Split into focused components under `src/components/portfolio/` (Nav, Hero, Philosophy, Skills, Projects, Demo, Logs, Contact, MemoryBanner, Toast). Keeps the single-page artifact readable and reviewable — the spec's "single file" intent is preserved at the route level.
-- Mem0 mock client + helpers in `src/lib/mem0/mock-client.ts` (typed, fully client-side, no backend needed).
-- Custom hooks in `src/hooks/`: `useInView` (threshold 0.12, fire-once), `useTypewriter`, `useScrollSpy`, `useClipboard`.
-- Per-section `head()` metadata via route options; root layout keeps sitewide defaults.
+### 4. Voice chat improvements
+- Granular mic permission error states: `not-allowed`, `not-found`, `not-supported`, `aborted`, network — each with tailored message + retry CTA.
+- Show live interim transcript (separate styling from final).
+- Stop button cancels both `SpeechRecognition` and the streaming fetch (AbortController).
+- Retry preserves last user prompt + partial assistant text; "regenerate" re-issues with same context.
+- Persist last 10 turns in `sessionStorage` for state recovery on reload.
 
-### SEO / AEO / GEO
-- Route `head()`: title, description, og:title/description/type=profile, og:url, twitter card, canonical (leaf only).
-- JSON-LD `Person` schema (name, jobTitle, location, sameAs links, knowsAbout skills) in route `scripts`.
-- JSON-LD `WebSite` + `BreadcrumbList`.
-- Semantic landmarks (`<header>`, `<main>`, `<nav>`, `<section aria-labelledby>`), single H1, alt text, focus rings.
-- AEO: FAQ-style structured copy in Philosophy + crisp factual stat strings answer-engines can lift.
-- GEO: `address` microdata (Kolkata, India · Remote), `geo` Person field, hreflang `en`.
+### 5. Click/gesture audit
+- Add a lightweight `useClickInstrumentation` hook that wraps `onClick` to log `{component, label, timestamp}` to console (gated by `VITE_DEBUG_CLICKS`) and to the in-app Logs feed.
+- Audit every `<button>`, `<a>`, and Framer `motion` element: ensure no `whileTap`/`whileHover` blocks pointer events, no overlay div without `pointer-events:none`, no `onClick` on parent + child stealing events.
+- Replace any `motion.button` with `<motion.button>` only where animation is needed; otherwise plain `<button>` with CSS transition.
+- Verify `ProjectModal`, Nav links, Resume button, Mem0 actions, VoiceChat controls all fire.
 
-### PWA (manifest-only, safe for Lovable preview)
-- `public/manifest.webmanifest` with name, short_name, theme `#16A07C`, background `#F7F8FA`, `display: standalone`, icons (192/512, generated).
-- `<link rel="manifest">` + theme-color meta in `__root.tsx`.
-- **No service worker** — per platform guidance, SWs break the preview iframe; manifest alone makes the site installable.
-
-### Performance & polish
-- `requestAnimationFrame` for scroll spy; passive listeners.
-- `content-visibility: auto` on below-fold sections.
-- Reduced-motion media query disables typewriter + parallax.
-- Lighthouse target: 95+ across the board.
+### 6. Mem0 ops test panel
+- New section `Mem0TestPanel` (collapsible, below VoiceChat) that runs a scripted suite:
+  1. `add` deterministic seed memory → assert id returned
+  2. `search` with known query → assert seed in results, score parsed
+  3. `score` on returned id → assert numeric
+  4. `delete` → assert success
+  5. `search` again → assert removed
+- Each step: status (pending/running/pass/fail), latency ms, raw request/response JSON in collapsible viewer, retry button (3 attempts, exponential backoff).
+- Uses real API when `MEM0_API_KEY` set; otherwise mock with banner.
 
 ### Technical notes
-- Stack stays TanStack Start + Tailwind v4 + TypeScript strict (the template's defaults). The spec's "single .jsx, no libraries" is adapted to the project's existing strict-TS / file-routing setup — visual output and behavior match the spec exactly; code is split for maintainability.
-- Fonts loaded via `<link rel="preconnect">` + Google Fonts `@import` in `styles.css`.
-- All copy verbatim from the spec — zero placeholder text.
-- No new npm dependencies required.
+- No new heavy deps. Use existing Framer Motion sparingly.
+- All new color/spacing tokens added to `src/styles.css`.
+- Keep changes within existing file structure; no `src/pages/`.
+- Verify build after each phase.
 
-### Out of scope (this pass)
-- Real mem0 backend wiring (mock client only, as specified).
-- Auth, analytics, or CMS.
-- Dark mode (explicitly excluded by the spec).
-
-Ready to build on approval.
+### Out of scope
+- Dark mode, i18n, auth, analytics provider integration.
