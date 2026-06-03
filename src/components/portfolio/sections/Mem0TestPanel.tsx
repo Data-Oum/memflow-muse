@@ -51,7 +51,6 @@ async function withRetry<T>(fn: () => Promise<T>, attempts = 3): Promise<{ value
 }
 
 export function Mem0TestPanel({ visitorId }: { visitorId: string }) {
-  const [open, setOpen] = useState(false);
   const [running, setRunning] = useState(false);
   const [apiMode, setApiMode] = useState<"real" | "mock" | null>(null);
   const [steps, setSteps] = useState(INITIAL);
@@ -218,9 +217,6 @@ export function Mem0TestPanel({ visitorId }: { visitorId: string }) {
           );
         })}
       </div>
-      {/* keep `open` referenced to silence unused warning while letting future collapse work */}
-      <span style={{ display: "none" }}>{open ? "1" : "0"}</span>
-      <button type="button" onClick={() => setOpen((o) => !o)} style={{ display: "none" }}>toggle</button>
     </Section>
   );
 }
