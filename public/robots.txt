@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://memflow-muse.lovable.app/sitemap.xml
