@@ -228,7 +228,6 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
           border: "1px solid var(--edge-subtle)",
           borderRadius: "var(--r-lg)",
           padding: 20,
-          boxShadow: "var(--shadow-sm)",
         }}
       >
         {/* Controls */}

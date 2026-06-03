@@ -216,7 +216,6 @@ export function Mem0Demo({
             display: "flex",
             flexDirection: "column",
             gap: 20,
-            boxShadow: "0 4px 24px rgba(0,0,0,0.02)",
           }}
         >
           <div
@@ -453,7 +452,6 @@ export function Mem0Demo({
             flexDirection: "column",
             gap: 20,
             minHeight: 360,
-            boxShadow: "0 4px 24px rgba(0,0,0,0.02)",
           }}
         >
           <div
