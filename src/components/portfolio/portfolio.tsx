@@ -8,6 +8,7 @@ import { Skills } from "./sections/Skills";
 import { Projects } from "./sections/Projects";
 import { Mem0Demo } from "./sections/Mem0Demo";
 import { VoiceChat } from "./sections/VoiceChat";
+import { Mem0TestPanel } from "./sections/Mem0TestPanel";
 import { Logs } from "./sections/Logs";
 import { Contact } from "./sections/Contact";
 import { ProjectModal } from "./sections/ProjectModal";
@@ -58,6 +59,7 @@ export function Portfolio() {
         <Projects onSelect={setSelectedProject} />
         <Mem0Demo visitorId={visitorId} showToast={showToast} />
         <VoiceChat visitorId={visitorId} />
+        <Mem0TestPanel visitorId={visitorId} />
         <Logs />
       </main>
       <Contact showToast={showToast} />
