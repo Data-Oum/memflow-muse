@@ -300,6 +300,23 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
               <Loader2 size={14} className="animate-spin" /> thinking…
             </div>
           )}
+          {listening && interim && (
+            <div
+              style={{
+                alignSelf: "flex-end",
+                maxWidth: "85%",
+                background: "var(--signal-light)",
+                color: "var(--signal)",
+                border: "1px dashed var(--signal-border)",
+                padding: "8px 12px",
+                borderRadius: 14,
+                fontSize: 13,
+                fontStyle: "italic",
+              }}
+            >
+              {interim}…
+            </div>
+          )}
         </div>
 
         {error && (
@@ -319,9 +336,10 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
             }}
           >
             <span>Something went wrong streaming the response.</span>
-            <button type="button" onClick={() => regenerate()} style={iconBtn(false)}>
-              Retry
-            </button>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button type="button" onClick={retryLast} style={iconBtn(false)}>Retry</button>
+              <button type="button" onClick={() => regenerate()} style={iconBtn(false)}>Regenerate</button>
+            </div>
           </div>
         )}
         {micError && (
@@ -386,7 +404,7 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
             }}
           />
           {busy ? (
-            <button type="button" onClick={() => stop()} style={iconBtn(true)}>
+            <button type="button" onClick={stopAll} style={iconBtn(true)}>
               <Square size={14} /> Stop
             </button>
           ) : (
