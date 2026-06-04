@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Toast } from "./ui/Toast";
 import { Nav } from "./sections/Nav";
-import { MemoryBanner } from "./sections/MemoryBanner";
 import { Hero } from "./sections/Hero";
 import { Philosophy } from "./sections/Philosophy";
 import { Skills } from "./sections/Skills";
 import { Projects } from "./sections/Projects";
-import { Mem0Demo } from "./sections/Mem0Demo";
 import { VoiceChat } from "./sections/VoiceChat";
 import { Mem0TestPanel } from "./sections/Mem0TestPanel";
-import { Logs } from "./sections/Logs";
+import { SeoValidationPanel } from "./sections/SeoValidationPanel";
 import { Contact } from "./sections/Contact";
 import { ProjectModal } from "./sections/ProjectModal";
+import { PwaInstallPrompt } from "./sections/PwaInstallPrompt";
+import { ClickInstrumentationLayer } from "./sections/ClickInstrumentationLayer";
 import type { Project } from "./data/projects";
 
 export function Portfolio() {
@@ -51,18 +51,18 @@ export function Portfolio() {
       }}
     >
       <Nav />
-      <MemoryBanner />
+      <ClickInstrumentationLayer />
       <main>
         <Hero />
         <Philosophy />
         <Skills />
         <Projects onSelect={setSelectedProject} />
-        <Mem0Demo visitorId={visitorId} showToast={showToast} />
         <VoiceChat visitorId={visitorId} />
         <Mem0TestPanel visitorId={visitorId} />
-        <Logs />
+        <SeoValidationPanel />
       </main>
       <Contact showToast={showToast} />
+      <PwaInstallPrompt />
       <footer
         style={{
           background: "var(--bg-raised)",
