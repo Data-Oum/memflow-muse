@@ -158,6 +158,8 @@
 
   html {
     scroll-behavior: auto; /* Lenis handles smooth scrolling */
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--ink-tertiary) 26%, transparent) transparent;
   }
 
   body {
@@ -167,10 +169,6 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
-  }
-
-  scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--ink-tertiary) 26%, transparent) transparent;
   }
 
   /* ── Quiet system scrollbars ── */
