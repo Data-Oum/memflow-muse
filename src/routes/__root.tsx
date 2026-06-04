@@ -149,11 +149,29 @@ function RootComponent() {
   useSmoothScroll();
 
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/sw.js")
-        .catch((err) => console.warn("[SW] Registration failed:", err));
+    if (!("serviceWorker" in navigator)) return;
+
+    const isPreview =
+      window.self !== window.top ||
+      window.location.hostname.startsWith("id-preview--") ||
+      window.location.hostname.startsWith("preview--") ||
+      window.location.hostname.endsWith(".lovableproject.com") ||
+      window.location.hostname.endsWith(".lovableproject-dev.com") ||
+      window.location.hostname.endsWith(".beta.lovable.dev") ||
+      window.location.search.includes("sw=off");
+
+    if (!import.meta.env.PROD || isPreview) {
+      navigator.serviceWorker.getRegistrations()
+        .then((registrations) => registrations
+          .filter((registration) => registration.active?.scriptURL.endsWith("/sw.js"))
+          .forEach((registration) => void registration.unregister()))
+        .catch(() => undefined);
+      return;
     }
+
+    navigator.serviceWorker
+      .register("/sw.js")
+      .catch((err) => console.warn("[SW] Registration failed:", err));
   }, []);
 
   return (
