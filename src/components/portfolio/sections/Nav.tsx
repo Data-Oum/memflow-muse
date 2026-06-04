@@ -4,8 +4,8 @@ const NAV_LINKS = [
   { id: "about", label: "About" },
   { id: "skills", label: "Skills" },
   { id: "work", label: "Work" },
-  { id: "demo", label: "Demo" },
-  { id: "logs", label: "Logs" },
+  { id: "voice", label: "Voice" },
+  { id: "validate", label: "SEO" },
   { id: "contact", label: "Contact" },
 ];
 
@@ -34,12 +34,10 @@ export function Nav() {
           style={{
             pointerEvents: "auto",
             height: 48,
-            background: "rgba(255, 255, 255, 0.65)",
-            backdropFilter: "blur(24px) saturate(200%)",
-            WebkitBackdropFilter: "blur(24px) saturate(200%)",
-            border: "1px solid rgba(0,0,0,0.06)",
+            background: "color-mix(in srgb, var(--bg-surface) 82%, transparent)",
+            backdropFilter: "blur(18px)",
+            border: "none",
             borderRadius: "var(--r-full)",
-            boxShadow: "0 12px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1)",
             padding: "0 8px 0 20px",
             display: "inline-flex",
             alignItems: "center",
@@ -107,7 +105,7 @@ export function Nav() {
             href="#contact"
             style={{
               background: "var(--signal)",
-              color: "#FFF",
+              color: "var(--bg-surface)",
               fontFamily: "var(--font-mono)",
               fontWeight: 600,
               fontSize: 10,
@@ -116,16 +114,15 @@ export function Nav() {
               textDecoration: "none",
               textTransform: "uppercase",
               letterSpacing: "0.05em",
-              transition: "transform 0.2s, box-shadow 0.2s",
-              boxShadow: "0 4px 12px rgba(22,160,124,0.3)",
+              transition: "opacity 0.2s, transform 0.2s",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-1px)";
-              e.currentTarget.style.boxShadow = "0 6px 16px rgba(22,160,124,0.4)";
+              e.currentTarget.style.opacity = "0.9";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 12px rgba(22,160,124,0.3)";
+              e.currentTarget.style.opacity = "1";
             }}
           >
             Available
@@ -151,12 +148,10 @@ export function Nav() {
         <nav
           style={{
             pointerEvents: "auto",
-            background: "rgba(255, 255, 255, 0.75)",
-            backdropFilter: "blur(24px) saturate(200%)",
-            WebkitBackdropFilter: "blur(24px) saturate(200%)",
-            border: "1px solid rgba(0,0,0,0.06)",
+            background: "color-mix(in srgb, var(--bg-surface) 86%, transparent)",
+            backdropFilter: "blur(18px)",
+            border: "none",
             borderRadius: "var(--r-full)",
-            boxShadow: "0 16px 48px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,1)",
             padding: "6px",
             display: "flex",
             alignItems: "center",

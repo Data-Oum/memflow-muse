@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Portfolio } from "@/components/portfolio/portfolio";
 
-const SITE_URL = "https://devamit.co.in";
+const SITE_URL = "https://memflow-muse.lovable.app";
+const IMAGE_URL = "https://devamit.co.in/amit-portrait.jpg";
 const FULL_NAME = "Amit Chakraborty";
 const JOB_TITLE = "Principal Architect · AI-Native Systems Engineer";
 const DESCRIPTION =
@@ -69,7 +70,7 @@ const personLd = {
   url: SITE_URL,
   email: "mailto:amit@devamit.co.in",
   telephone: "+91-9874173663",
-  image: `${SITE_URL}/amit-portrait.jpg`,
+  image: IMAGE_URL,
   address: {
     "@type": "PostalAddress",
     addressLocality: "Kolkata",
@@ -267,7 +268,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: `${FULL_NAME} — Principal Frontend · mem0` },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:site_name", content: "Amit Chakraborty Portfolio" },
-      { property: "og:image", content: `${SITE_URL}/amit-portrait.jpg` },
+      { property: "og:image", content: IMAGE_URL },
       { property: "og:image:alt", content: `${FULL_NAME} — Principal Architect` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
@@ -282,7 +283,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:creator", content: "@devamitch" },
       { name: "twitter:title", content: `${FULL_NAME} — Principal Frontend · mem0` },
       { name: "twitter:description", content: DESCRIPTION },
-      { name: "twitter:image", content: `${SITE_URL}/amit-portrait.jpg` },
+      { name: "twitter:image", content: IMAGE_URL },
       { name: "twitter:image:alt", content: `${FULL_NAME} — Principal Architect` },
 
       // ── GEO (Geographic SEO)

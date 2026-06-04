@@ -1,7 +1,6 @@
 import { Mail, Github, Linkedin, Twitter } from "lucide-react";
 import { Section } from "../ui/Section";
 import { Label } from "../ui/Label";
-import { Terminal } from "../ui/Terminal";
 import { ResumeButton } from "../ui/ResumeButton";
 
 const SOCIAL_LINKS = [
@@ -48,15 +47,6 @@ export function Contact({ showToast }: { showToast: (m: string) => void }) {
     }
   };
 
-  const finalCode = `// What Amit ships from day one
-await mem0.add([
-  { role: "engineer", content: "Polished production UIs, end-to-end" },
-  { role: "engineer", content: "AI-native workflow — Claude Code, Cursor, Windsurf" },
-  { role: "engineer", content: "mem0 SDK integrated before the first interview" },
-  { role: "engineer", content: "8 years of shipped systems. No unfinished work." }
-], { user_id: "mem0_team", metadata: { status: "open_to_hire" } });
-
-// { id: "mem_amit_001", score: 0.99, category: "hire_now" }`;
 
   return (
     <div
@@ -86,8 +76,7 @@ await mem0.add([
             maxWidth: 640,
           }}
         >
-          I&apos;ve studied the SDK. I&apos;ve built the demo. I&apos;ve shipped the logs.
-          Here&apos;s how to reach me.
+I build polished AI-native product surfaces, memory-aware workflows, and production systems that keep their calm under load. Here&apos;s how to reach me.
         </p>
 
         <div
@@ -145,15 +134,6 @@ await mem0.add([
           <ResumeButton />
         </div>
 
-        <Terminal
-          log={{
-            tool: "amit.contribution",
-            date: "ready",
-            filename: "amit.contribution.js",
-            prompt: finalCode,
-            output: "",
-          }}
-        />
       </Section>
     </div>
   );
