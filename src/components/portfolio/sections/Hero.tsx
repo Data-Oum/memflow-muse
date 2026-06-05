@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
+import { MemoryGraph } from "../ui/MemoryGraph";
 
 const PORTRAIT_URL = "https://devamit.co.in/amit-portrait.jpg";
 
@@ -84,18 +85,22 @@ export function Hero() {
         overflow: "hidden",
       }}
     >
-      {/* Ambient glow */}
+      {/* Mem0-inspired ambient memory graph */}
       <div
         aria-hidden
         style={{
           position: "absolute",
           inset: 0,
-          background:
-            "radial-gradient(ellipse 700px 500px at 70% 40%, rgba(22,160,124,0.07) 0%, transparent 60%)," +
-            "radial-gradient(ellipse 400px 300px at 20% 80%, rgba(22,160,124,0.04) 0%, transparent 60%)",
           pointerEvents: "none",
+          opacity: 0.55,
+          maskImage:
+            "radial-gradient(ellipse 70% 60% at 60% 40%, #000 35%, transparent 80%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 70% 60% at 60% 40%, #000 35%, transparent 80%)",
         }}
-      />
+      >
+        <MemoryGraph density={18} />
+      </div>
 
       <div
         style={{
