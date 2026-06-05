@@ -7,7 +7,7 @@
    • API calls (/api/*): Network-only, never cached
 ───────────────────────────────────────────────────────────────────────────── */
 
-const CACHE_VERSION = "amit-portfolio-v3";
+const CACHE_VERSION = "amit-portfolio-v4";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const ASSET_CACHE = `${CACHE_VERSION}-assets`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
