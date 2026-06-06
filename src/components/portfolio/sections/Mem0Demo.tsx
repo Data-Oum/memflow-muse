@@ -10,6 +10,8 @@ import {
 } from "@/lib/api/memory.functions";
 import { Section } from "../ui/Section";
 import { Label } from "../ui/Label";
+import { logSearch } from "@/lib/api/search-history.functions";
+import { RecentSearches } from "./RecentSearches";
 
 /* ── Helpers ────────────────────────────────────────────────── */
 
@@ -82,6 +84,7 @@ export function Mem0Demo({
   const [code, setCode] = useState<string>(
     `await mem0.add(\n  [{ role: "user", content: "..." }],\n  { user_id: "${visitorId}" }\n);`,
   );
+  const [searchRefresh, setSearchRefresh] = useState(0);
 
   const onAdd = useCallback(async () => {
     if (!input.trim()) return;
@@ -102,6 +105,15 @@ export function Mem0Demo({
         setMemories((prev) => [res.data!, ...prev]);
         setApiMode(res.apiMode);
         showToast(res.apiMode === "real" ? "Memory stored via mem0 API" : "Memory stored (local)");
+        void logSearch({
+          data: {
+            visitorId,
+            source: "mem0_demo",
+            query: input.slice(0, 500),
+            resultCount: 1,
+            metadata: { op: "add", mode: res.apiMode },
+          },
+        }).then(() => setSearchRefresh((n) => n + 1)).catch(() => {});
       } else {
         setApiMode(res.apiMode);
         setError(res.error ?? "mem0 could not store this memory.");
@@ -140,6 +152,15 @@ export function Mem0Demo({
       if (res.success && res.data) {
         setResults(res.data);
         setApiMode(res.apiMode);
+        void logSearch({
+          data: {
+            visitorId,
+            source: "mem0_demo",
+            query: (searchQ || "portfolio context").slice(0, 500),
+            resultCount: res.data.length,
+            metadata: { op: "search", mode: res.apiMode },
+          },
+        }).then(() => setSearchRefresh((n) => n + 1)).catch(() => {});
       } else {
         setApiMode(res.apiMode);
         setError(res.error ?? "mem0 search failed.");
@@ -226,6 +247,8 @@ export function Mem0Demo({
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              flexWrap: "wrap",
+              gap: 6,
             }}
           >
             <span>mem0 · add()</span>
@@ -240,11 +263,24 @@ export function Mem0Demo({
                   padding: "2px 8px",
                   borderRadius: "var(--r-full)",
                 }}
+                title={apiMode === "mock" ? "MEM0_API_KEY missing — running mock. Add it in Lovable Secrets to enable real RAG." : "Live mem0 API"}
               >
                 {apiMode === "real" ? "● API Connected" : "○ Local Demo Mode"}
               </span>
             )}
           </div>
+
+          <RecentSearches
+            visitorId={visitorId}
+            source="mem0_demo"
+            limit={5}
+            refreshKey={searchRefresh}
+            onSelect={(q) => {
+              setInput(q);
+              setSearchQ(q);
+              setShowSearch(true);
+            }}
+          />
 
           <textarea
             value={input}

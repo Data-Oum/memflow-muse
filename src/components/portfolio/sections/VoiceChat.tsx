@@ -5,6 +5,8 @@ import { Mic, MicOff, Send, Square, Volume2, VolumeX, Loader2 } from "lucide-rea
 import ReactMarkdown from "react-markdown";
 import { Section } from "../ui/Section";
 import { Label } from "../ui/Label";
+import { logSearch } from "@/lib/api/search-history.functions";
+import { useEnvHealth } from "@/hooks/use-env-health";
 
 /* Web Speech API typing — minimal */
 type SR = {
@@ -40,6 +42,8 @@ const STORAGE_KEY = "voicechat_history_v1";
 
 export function VoiceChat({ visitorId }: { visitorId: string }) {
   const transport = useMemo(() => new DefaultChatTransport({ api: "/api/chat" }), []);
+  const { data: envHealth } = useEnvHealth();
+  const gatewayOffline = envHealth ? envHealth.missing.includes("LOVABLE_API_KEY") : false;
   const [input, setInput] = useState("");
   const [interim, setInterim] = useState("");
   const [listening, setListening] = useState(false);
@@ -104,10 +108,19 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
   function send(text: string) {
     const t = text.trim();
     if (!t || busy) return;
+    if (gatewayOffline) return;
     lastPromptRef.current = t;
     setInput("");
     setInterim("");
     void sendMessage({ text: t }, { body: { userId: visitorId } });
+    void logSearch({
+      data: {
+        visitorId,
+        source: "voice_chat",
+        query: t.slice(0, 500),
+        metadata: { mode: "chat" },
+      },
+    }).catch(() => {});
   }
 
   function stopAll() {
@@ -356,11 +369,27 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
             {micError}
           </div>
         )}
+        {gatewayOffline && (
+          <div
+            role="alert"
+            style={{
+              background: "#FEF3C7",
+              color: "#92400E",
+              border: "1px solid #FCD34D",
+              padding: "8px 12px",
+              borderRadius: "var(--r-md)",
+              fontSize: 13,
+              fontFamily: "var(--font-mono)",
+            }}
+          >
+            AI gateway offline — voice chat is unavailable. Add LOVABLE_API_KEY in Lovable Secrets to enable it.
+          </div>
+        )}
 
         {/* Suggestions */}
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {suggestions.map((s) => (
-            <button key={s} type="button" onClick={() => send(s)} disabled={busy} style={chip()}>
+            <button key={s} type="button" onClick={() => send(s)} disabled={busy || gatewayOffline} style={chip()}>
               {s}
             </button>
           ))}
@@ -377,9 +406,10 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
           <button
             type="button"
             onClick={toggleMic}
+            disabled={gatewayOffline}
             aria-label={listening ? "Stop listening" : "Start voice input"}
             aria-pressed={listening}
-            style={iconBtn(listening)}
+            style={{ ...iconBtn(listening), opacity: gatewayOffline ? 0.5 : 1, cursor: gatewayOffline ? "not-allowed" : "pointer" }}
           >
             {listening ? <MicOff size={14} /> : <Mic size={14} />}
             {listening ? "Listening" : "Voice"}
@@ -388,8 +418,8 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask Amit's assistant…"
-            disabled={busy}
+            placeholder={gatewayOffline ? "AI gateway offline" : "Ask Amit's assistant…"}
+            disabled={busy || gatewayOffline}
             style={{
               flex: 1,
               padding: "10px 14px",
@@ -407,7 +437,7 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
               <Square size={14} /> Stop
             </button>
           ) : (
-            <button type="submit" disabled={!input.trim()} style={iconBtn(false)}>
+            <button type="submit" disabled={!input.trim() || gatewayOffline} style={iconBtn(false)}>
               <Send size={14} /> Send
             </button>
           )}

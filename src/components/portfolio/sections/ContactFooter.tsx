@@ -207,27 +207,20 @@ export function ContactFooter({ showToast }: { showToast: (m: string) => void })
             <button
               type="button"
               onClick={copyEmail}
+              className="cf-email-cta"
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: 12,
-                background: "rgba(124,58,237,0.10)",
-                border: "1px solid rgba(124,58,237,0.22)",
+                background: "linear-gradient(135deg, rgba(124,58,237,0.18), rgba(124,58,237,0.08))",
+                border: "1px solid rgba(124,58,237,0.28)",
                 borderRadius: 12,
                 padding: "16px 20px",
                 cursor: "pointer",
                 width: "100%",
                 marginBottom: 12,
-                transition: "background 0.18s, border-color 0.18s",
+                transition: "transform 0.2s cubic-bezier(0.16,1,0.3,1), box-shadow 0.2s, border-color 0.2s",
                 textAlign: "left",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(124,58,237,0.16)";
-                e.currentTarget.style.borderColor = "rgba(124,58,237,0.4)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(124,58,237,0.10)";
-                e.currentTarget.style.borderColor = "rgba(124,58,237,0.22)";
               }}
             >
               <span
@@ -395,6 +388,7 @@ export function ContactFooter({ showToast }: { showToast: (m: string) => void })
                 {META_ROWS.map(([k, v]) => (
                   <div
                     key={k}
+                    className="cf-meta-row"
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
@@ -402,8 +396,6 @@ export function ContactFooter({ showToast }: { showToast: (m: string) => void })
                       padding: "10px 24px",
                       transition: "background 0.12s",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.025)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                   >
                     <span
                       style={{
@@ -608,6 +600,13 @@ export function ContactFooter({ showToast }: { showToast: (m: string) => void })
 
       {/* Responsive styles */}
       <style>{`
+        .cf-email-cta:hover {
+          transform: translateY(-2px);
+          border-color: rgba(124,58,237,0.55) !important;
+          box-shadow: 0 12px 32px -12px rgba(124,58,237,0.45);
+        }
+        .cf-email-cta:active { transform: translateY(0); }
+        .cf-meta-row:hover { background: rgba(255,255,255,0.025); }
         @media (max-width: 680px) {
           .cf-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
           .cf-footer-row { grid-template-columns: 1fr !important; gap: 12px !important; }

@@ -47,7 +47,14 @@ export function MemoryGraph({
     }));
 
     let raf = 0;
-    const tick = () => {
+    let last = 0;
+    const tick = (now: number) => {
+      // Throttle to ~30fps — visually identical, cuts work in half on mobile.
+      if (now - last < 33) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      last = now;
       for (const n of state) {
         n.x += n.vx;
         n.y += n.vy;
