@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { Json } from "@/integrations/supabase/types";
 
 const SOURCES = ["mem0_demo", "voice_chat", "project_filter"] as const;
 type Source = (typeof SOURCES)[number];
@@ -22,7 +23,7 @@ export const logSearch = createServerFn({ method: "POST" })
         source: data.source,
         query: data.query,
         result_count: data.resultCount ?? null,
-        metadata: data.metadata ?? {},
+        metadata: (data.metadata ?? {}) as Json,
       });
       if (error) {
         console.warn("[search-history] insert failed:", error.message);
