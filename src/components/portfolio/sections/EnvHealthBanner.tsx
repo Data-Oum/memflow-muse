@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { checkRequiredEnv } from "@/lib/api/env-check.functions";
-
-type EnvStatus = { ok: boolean; missing: string[]; mem0Mode: "real" | "mock" };
+import { useEnvHealth } from "@/hooks/use-env-health";
 
 /**
  * Fixed-position banner that surfaces missing required env vars
@@ -9,27 +7,17 @@ type EnvStatus = { ok: boolean; missing: string[]; mem0Mode: "real" | "mock" };
  * user can dismiss for the session.
  */
 export function EnvHealthBanner() {
-  const [status, setStatus] = useState<EnvStatus | null>(null);
+  const { data: status, loading, refetch } = useEnvHealth();
   const [dismissed, setDismissed] = useState(false);
+  const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
-    checkRequiredEnv()
-      .then((s) => {
-        if (mounted) setStatus(s);
-      })
-      .catch(() => {
-        if (mounted) setStatus({ ok: false, missing: ["unknown"], mem0Mode: "mock" });
-      });
     try {
       if (sessionStorage.getItem("env_banner_dismissed") === "1") setDismissed(true);
     } catch {}
-    return () => {
-      mounted = false;
-    };
   }, []);
 
-  if (!status || status.ok || dismissed) return null;
+  if (loading || !status || status.ok || dismissed) return null;
 
   return (
     <div
@@ -64,6 +52,29 @@ export function EnvHealthBanner() {
         <span>{status.missing.join(", ")}</span>
         <div style={{ marginTop: 4, color: "rgba(252,165,165,0.7)", fontSize: 11 }}>
           mem0 running in <b>{status.mem0Mode}</b> mode. Add the keys in Lovable Secrets.
+        </div>
+        <div style={{ marginTop: 8, display: "flex", gap: 8 }}>
+          <button
+            type="button"
+            disabled={retrying}
+            onClick={async () => {
+              setRetrying(true);
+              await refetch();
+              setRetrying(false);
+            }}
+            style={{
+              background: "rgba(239,68,68,0.18)",
+              border: "1px solid rgba(239,68,68,0.45)",
+              color: "#fecaca",
+              padding: "4px 10px",
+              borderRadius: 6,
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              cursor: retrying ? "wait" : "pointer",
+            }}
+          >
+            {retrying ? "Checking…" : "Retry"}
+          </button>
         </div>
       </div>
       <button
