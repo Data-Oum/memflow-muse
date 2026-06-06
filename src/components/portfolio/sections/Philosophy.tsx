@@ -1,5 +1,6 @@
 import { Section } from "../ui/Section";
 import { Label } from "../ui/Label";
+import { SpotlightCard } from "@/components/ui/spotlight";
 
 const PRINCIPLES = [
   {
@@ -22,49 +23,57 @@ const PRINCIPLES = [
 export function Philosophy() {
   return (
     <Section id="about">
-      <Label>{'[ memory.get({ entity: "principles" }) ]'}</Label>
+      <Label>memory.get(&quot;principles&quot;)</Label>
 
       <h2
         style={{
-          fontFamily: "var(--font-serif)",
-          fontSize: 36,
-          fontWeight: 400,
+          fontFamily: "var(--font-display)",
+          fontSize: "clamp(28px, 4vw, 42px)",
+          fontWeight: 600,
           color: "var(--ink-primary)",
-          margin: "12px 0 48px",
-          lineHeight: 1.2,
+          margin: "12px 0 32px",
+          lineHeight: 1.15,
         }}
       >
-        <i>How I think</i> about building.
+        How I think about building.
       </h2>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
           gap: 16,
         }}
       >
         {PRINCIPLES.map((p) => (
-          <div key={p.title} className="pm-card">
+          <SpotlightCard
+            key={p.title}
+            spotlightSize={240}
+            style={{
+              background: "var(--bg-surface)",
+              border: "1px solid var(--edge-default)",
+              borderRadius: "var(--r-lg)",
+              padding: 24,
+              transition: "border-color 0.24s var(--ease)",
+            }}
+          >
             <div
               style={{
                 fontFamily: "var(--font-mono)",
-                fontSize: 12,
+                fontSize: 11,
                 color: "var(--signal)",
                 marginBottom: 16,
-                paddingBottom: 8,
-                borderBottom: "1px solid var(--signal-border)",
-                display: "inline-block",
               }}
             >
               [{p.index}]
             </div>
             <h3
               style={{
-                fontSize: 18,
+                fontSize: 17,
                 fontWeight: 600,
+                fontFamily: "var(--font-display)",
                 color: "var(--ink-primary)",
-                marginBottom: 8,
+                marginBottom: 10,
               }}
             >
               {p.title}
@@ -79,7 +88,7 @@ export function Philosophy() {
             >
               {p.body}
             </p>
-          </div>
+          </SpotlightCard>
         ))}
       </div>
     </Section>

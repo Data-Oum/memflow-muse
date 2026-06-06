@@ -1,106 +1,234 @@
-import { ExternalLink, ArrowRight } from 'lucide-react';
-import { Section } from '../ui/Section';
-import { Label } from '../ui/Label';
-import { PROJECTS, type Project } from '../data/projects';
-import { useInView } from '@/hooks/use-in-view';
+import { useInView } from "@/hooks/use-in-view";
+import { ExternalLink } from "lucide-react";
+import { PROJECTS, type Project } from "../data/projects";
 
 function ProjectCard({ p, onSelect }: { p: Project; onSelect: (p: Project) => void }) {
-  const { ref, isInView } = useInView<HTMLDivElement>(0.18);
+  const { ref, isInView } = useInView<HTMLDivElement>(0.15);
 
   return (
     <div
       ref={ref}
       onClick={() => onSelect(p)}
-      className="group relative cursor-pointer bg-[var(--bg-surface)] border border-[var(--edge-subtle)] rounded-lg p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-[var(--edge-default)] flex flex-col h-full overflow-hidden"
+      style={{
+        position: "relative",
+        cursor: "pointer",
+        background: "#FFFFFF",
+        borderRadius: 16,
+        padding: "20px 20px 18px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+        overflow: "hidden",
+        transition: "transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.15s",
+        opacity: isInView ? 1 : 0,
+        transform: isInView ? "none" : "translateY(10px)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-3px)";
+        e.currentTarget.style.background = "#FDFCFF";
+        e.currentTarget.style.boxShadow = `0 8px 32px -8px ${p.signal}22, 0 2px 8px rgba(0,0,0,0.04)`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "none";
+        e.currentTarget.style.background = "#FFFFFF";
+        e.currentTarget.style.boxShadow = "none";
+      }}
     >
-      {/* Top accent score bar */}
-      <div
-        className="absolute top-0 left-0 h-[2px] transition-all duration-1000 ease-out"
+      {/* Colored top bar — signal accent */}
+      {/* <div
         style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 2.5,
           backgroundColor: p.signal,
-          width: isInView ? `${p.score * 100}%` : '0%',
+          transformOrigin: "left",
+          transform: isInView ? "scaleX(1)" : "scaleX(0)",
+          transition: "transform 0.85s cubic-bezier(0.16,1,0.3,1)",
+          borderRadius: "16px",
+          opacity: isInView ? 0.7 : 0,
         }}
-      />
+      /> */}
 
-      {/* Row: project id + score */}
-      <div className="flex justify-between items-center mb-4">
-        <span className="font-mono text-[11px] text-[var(--ink-tertiary)]">{p.id}</span>
-        <div className="flex items-center gap-1.5 font-mono text-[11px]" style={{ color: p.signal }}>
-          <span>score:</span>
-          <span>{p.score.toFixed(2)}</span>
-        </div>
-      </div>
-
-      {/* Category pill */}
-      <div className="mb-4">
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full font-mono text-[10px] text-[var(--ink-secondary)] bg-[var(--bg-raised)]">
-          {p.category}
+      {/* ID + score */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 10,
+            color: "var(--ink-tertiary)",
+            letterSpacing: "0.04em",
+          }}
+        >
+          {p.id}
+        </span>
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 10,
+            color: p.signal,
+            letterSpacing: "0.02em",
+          }}
+        >
+          {p.score.toFixed(2)}
         </span>
       </div>
 
-      {/* Name + tagline */}
-      <div className="mb-3">
-        <h3 className="font-sans font-medium text-lg text-[var(--ink-primary)] leading-tight mb-1 group-hover:text-[var(--signal)] transition-colors flex items-center gap-2">
-          {p.name}
-          <ExternalLink size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
-        </h3>
-        <p className="font-serif text-[var(--ink-secondary)] text-sm">
-          {p.tagline}
-        </p>
-      </div>
+      {/* Category */}
+      <span
+        style={{
+          display: "inline-flex",
+          alignSelf: "flex-start",
+          padding: "3px 8px",
+          borderRadius: 999,
+          fontFamily: "var(--font-mono)",
+          fontSize: 9,
+          color: p.signal,
+          background: `color-mix(in srgb, ${p.signal} 8%, white)`,
+          letterSpacing: "0.04em",
+        }}
+      >
+        {p.category}
+      </span>
 
-      {/* Description */}
-      <p className="font-sans text-[13px] text-[var(--ink-secondary)] leading-relaxed mb-6 flex-grow">
-        {p.description}
+      {/* Name */}
+      <h3
+        style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 600,
+          fontSize: 16,
+          color: "var(--ink-primary)",
+          lineHeight: 1.25,
+          margin: 0,
+          display: "flex",
+          alignItems: "center",
+          gap: 5,
+        }}
+      >
+        {p.name}
+        <ExternalLink size={12} style={{ color: "var(--ink-tertiary)", flexShrink: 0, opacity: 0.45 }} />
+      </h3>
+
+      {/* Tagline */}
+      <p style={{ fontSize: 13, color: "var(--ink-secondary)", lineHeight: 1.5, margin: 0 }}>
+        {p.tagline}
       </p>
 
-      {/* Stack tags */}
-      <div className="flex flex-wrap gap-1.5 mb-6">
-        {p.stack.slice(0, 3).map((tech, i) => (
+      {/* Stack tags — no borders */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: "auto" }}>
+        {p.stack.slice(0, 3).map((tech) => (
           <span
-            key={i}
-            className="font-mono text-[9px] px-1.5 py-0.5 border border-[var(--edge-subtle)] rounded text-[var(--ink-tertiary)]"
+            key={tech}
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 9,
+              padding: "2px 7px",
+              borderRadius: 999,
+              color: "var(--ink-tertiary)",
+              background: "#F3F4F6",
+            }}
           >
             {tech}
           </span>
         ))}
         {p.stack.length > 3 && (
-          <span className="font-mono text-[9px] px-1.5 py-0.5 border border-[var(--edge-subtle)] rounded text-[var(--ink-tertiary)]">
+          <span
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 9,
+              padding: "2px 7px",
+              borderRadius: 999,
+              color: "var(--ink-tertiary)",
+              background: "#F3F4F6",
+            }}
+          >
             +{p.stack.length - 3}
           </span>
         )}
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-4 border-t border-[var(--edge-subtle)] mt-auto">
-        <span className="font-mono text-[10px] text-[var(--ink-tertiary)]">{p.year}</span>
-        <div className="flex items-center gap-1 text-[11px] font-mono text-[var(--ink-primary)] group-hover:text-[var(--signal)] transition-colors">
-          View Details
-          <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
-        </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingTop: 12,
+          borderTop: "1px solid #F3F4F6",
+        }}
+      >
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "var(--ink-tertiary)" }}>
+          {p.year}
+        </span>
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: 10,
+            color: p.signal,
+            display: "flex",
+            alignItems: "center",
+            gap: 3,
+          }}
+        >
+          Details →
+        </span>
       </div>
     </div>
   );
 }
 
-export function Projects(props: { onSelect: (p: Project) => void }) {
+export function Projects({ onSelect }: { onSelect: (p: Project) => void }) {
   return (
-    <Section id="work">
-      <div className="flex flex-col gap-3 mb-10">
-        <Label>{'[ memory.search({ query: "shipped production systems" }) ]'}</Label>
-        <h2 className="text-3xl md:text-4xl font-serif text-[var(--ink-primary)]">
-          Shipped systems, not side projects.
-        </h2>
+    <section
+      id="projects"
+      style={{ background: "#F7F8FA", padding: "56px 24px 64px" }}
+    >
+      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+        {/* Header */}
+        <div style={{ marginBottom: 36 }}>
+          <div
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              color: "var(--signal)",
+              letterSpacing: "0.04em",
+              marginBottom: 10,
+              opacity: 0.75,
+            }}
+          >
+            mem0.search("amit_projects", limit: 6)
+          </div>
+          <h2
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(1.8rem, 4vw, 2.75rem)",
+              fontWeight: 700,
+              color: "var(--ink-primary)",
+              letterSpacing: "-0.025em",
+              lineHeight: 1.1,
+              margin: 0,
+            }}
+          >
+            Shipped systems.
+          </h2>
+        </div>
+
+        {/* Grid */}
+        <div
+          className="projects-grid"
+          style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}
+        >
+          {PROJECTS.map((p) => (
+            <ProjectCard key={p.id} p={p} onSelect={onSelect} />
+          ))}
+        </div>
       </div>
 
-      <div
-        className="grid gap-6"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}
-      >
-        {PROJECTS.map((p) => (
-          <ProjectCard key={p.id} p={p} onSelect={props.onSelect} />
-        ))}
-      </div>
-    </Section>
+      <style>{`
+        @media (max-width: 900px) { .projects-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+        @media (max-width: 560px) { .projects-grid { grid-template-columns: 1fr !important; } }
+      `}</style>
+    </section>
   );
 }

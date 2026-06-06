@@ -1,28 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Toast } from "./ui/Toast";
-import { Nav } from "./sections/Nav";
-import { Hero } from "./sections/Hero";
-import { Philosophy } from "./sections/Philosophy";
-import { Skills } from "./sections/Skills";
-import { Projects } from "./sections/Projects";
-import { VoiceChat } from "./sections/VoiceChat";
-import { Mem0TestPanel } from "./sections/Mem0TestPanel";
-import { SeoValidationPanel } from "./sections/SeoValidationPanel";
-import { Contact } from "./sections/Contact";
-import { ProjectModal } from "./sections/ProjectModal";
-import { PwaInstallPrompt } from "./sections/PwaInstallPrompt";
-import { ClickInstrumentationLayer } from "./sections/ClickInstrumentationLayer";
+import { useCallback, useRef, useState, useEffect } from "react";
 import type { Project } from "./data/projects";
+import { ClickInstrumentationLayer } from "./sections/ClickInstrumentationLayer";
+import { ContactFooter } from "./sections/ContactFooter";
+import { Hero } from "./sections/Hero";
+import { Nav } from "./sections/Nav";
+import { ProjectModal } from "./sections/ProjectModal";
+import { Projects } from "./sections/Projects";
+import { PwaInstallPrompt } from "./sections/PwaInstallPrompt";
+import { TechnicalChops } from "./sections/TechnicalChops";
+import { VoiceChatDialog } from "./sections/VoiceChatDialog";
+import { WhyMem0 } from "./sections/WhyMem0";
+import { Toast } from "./ui/Toast";
 
 export function Portfolio() {
   const [visitorId, setVisitorId] = useState("visitor_ssr000");
   useEffect(() => {
     try {
       const existing = localStorage.getItem("portfolio_visitor_id");
-      if (existing) {
-        setVisitorId(existing);
-        return;
-      }
+      if (existing) { setVisitorId(existing); return; }
       const id = "visitor_" + Math.random().toString(36).slice(2, 7);
       localStorage.setItem("portfolio_visitor_id", id);
       setVisitorId(id);
@@ -42,43 +37,28 @@ export function Portfolio() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   return (
-    <div
-      style={{
-        background: "var(--bg-page)",
-        color: "var(--ink-primary)",
-        minHeight: "100vh",
-        paddingBottom: 64, // Add padding for bottom nav on mobile
-      }}
-    >
+    <div style={{ background: "var(--bg-page)", color: "var(--ink-primary)", minHeight: "100vh" }}>
       <Nav />
       <ClickInstrumentationLayer />
-      <main>
-        <Hero />
-        <Philosophy />
-        <Skills />
-        <Projects onSelect={setSelectedProject} />
-        <VoiceChat visitorId={visitorId} />
-        <Mem0TestPanel visitorId={visitorId} />
-        <SeoValidationPanel />
-      </main>
-      <Contact showToast={showToast} />
-      <PwaInstallPrompt />
-      <footer
-        style={{
-          background: "var(--bg-raised)",
-          padding: "32px 24px",
-          textAlign: "center",
-          fontFamily: "var(--font-mono)",
-          fontSize: 11,
-          color: "var(--ink-tertiary)",
-          borderTop: "1px solid var(--edge-subtle)",
-        }}
-      >
-        // built with mem0 · {new Date().getFullYear()} · Kolkata → Remote
-      </footer>
-      <Toast message={toast} />
 
-      {/* Project Modal */}
+      <main>
+        {/* 1. Hero — WHITE */}
+        <Hero />
+        {/* 2. Projects — LIGHT */}
+        <Projects onSelect={setSelectedProject} />
+        {/* 3. TechnicalChops — DARK (id="skills" for nav) */}
+        <TechnicalChops />
+        {/* 4. WhyMem0 — LIGHT (white, max contrast between dark sections) */}
+        <WhyMem0 />
+      </main>
+
+      {/* Contact + Footer — unified dark closing section */}
+      <ContactFooter showToast={showToast} />
+
+      <Toast message={toast} />
+      <VoiceChatDialog visitorId={visitorId} />
+      <PwaInstallPrompt />
+
       {selectedProject && (
         <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
       )}

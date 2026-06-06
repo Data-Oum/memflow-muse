@@ -12,10 +12,12 @@ export function MemoryGraph({
   density = 14,
   className,
   style,
+  mode = "dark",
 }: {
   density?: number;
   className?: string;
   style?: React.CSSProperties;
+  mode?: "light" | "dark";
 }) {
   const ref = useRef<SVGSVGElement>(null);
 
@@ -117,8 +119,8 @@ export function MemoryGraph({
     >
       <defs>
         <radialGradient id="mg-node-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="rgba(22,160,124,0.85)" />
-          <stop offset="100%" stopColor="rgba(22,160,124,0)" />
+          <stop offset="0%" stopColor="rgba(124,58,237,0.75)" />
+          <stop offset="100%" stopColor="rgba(124,58,237,0)" />
         </radialGradient>
       </defs>
       {edges.map((e, idx) => (
@@ -131,19 +133,25 @@ export function MemoryGraph({
           y1={nodes[e.a].cy}
           x2={nodes[e.b].cx}
           y2={nodes[e.b].cy}
-          stroke="rgba(22,160,124,0.18)"
+          stroke={mode === "light" ? "rgba(124,58,237,0.22)" : "rgba(124,58,237,0.14)"}
           strokeWidth={0.12}
         />
       ))}
       {nodes.map((n) => (
         <g key={`n${n.i}`}>
-          <circle cx={n.cx} cy={n.cy} r={n.r * 2.4} fill="url(#mg-node-glow)" opacity={0.35} />
+          <circle
+            cx={n.cx}
+            cy={n.cy}
+            r={n.r * 2.4}
+            fill="url(#mg-node-glow)"
+            opacity={mode === "light" ? 0.25 : 0.35}
+          />
           <circle
             data-node
             cx={n.cx}
             cy={n.cy}
             r={n.r}
-            fill="rgba(22,160,124,0.9)"
+            fill={mode === "light" ? "rgba(124,58,237,0.65)" : "rgba(124,58,237,0.8)"}
           />
         </g>
       ))}

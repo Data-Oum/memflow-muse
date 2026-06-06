@@ -1,12 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { Portfolio } from "@/components/portfolio/portfolio";
+import { createFileRoute } from "@tanstack/react-router";
 
-const SITE_URL = "https://memflow-muse.lovable.app";
+const SITE_URL = "https://memflowmuse.devamit.co.in";
 const IMAGE_URL = "https://devamit.co.in/amit-portrait.jpg";
 const FULL_NAME = "Amit Chakraborty";
 const JOB_TITLE = "Principal Architect · AI-Native Systems Engineer";
 const DESCRIPTION =
-  "Amit Chakraborty — Principal Architect & AI-Native Systems Engineer. 8+ years, 18+ production apps shipped, 21 engineers led. 50K+ peak DAU. Targeting Staff / Principal Frontend Engineer at mem0. Built with mem0 as the context memory layer.";
+  "Amit Chakraborty — Principal Architect & AI-Native Systems Engineer. 8+ years, 18+ production apps, 50K+ peak DAU. Built 5 production systems at Synapsis, led 21-person team. Specializes in React Native (Bridgeless), AI/RAG pipelines, computer vision, Web3. This portfolio uses mem0 for context memory — live demo of persistent memory infrastructure."
 const KEYWORDS =
   "Amit Chakraborty, mem0, principal frontend engineer, AI-native, React, Next.js, TypeScript, React Native, Kolkata, remote, Staff Engineer, AI memory, RAG pipelines, WebGPU, Solidity, Web3";
 
@@ -250,7 +250,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       // ── Core
-      { title: `${FULL_NAME} — Principal Frontend Engineer · mem0` },
+      { title: `${FULL_NAME} — Staff Engineer · AI-Native · mem0` },
       { name: "description", content: DESCRIPTION },
       { name: "keywords", content: KEYWORDS },
       { name: "author", content: FULL_NAME },
@@ -259,7 +259,7 @@ export const Route = createFileRoute("/")({
         name: "robots",
         content: "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
       },
-      { name: "theme-color", content: "#16A07C" },
+      { name: "theme-color", content: "#7C3AED" },
       { name: "color-scheme", content: "light" },
 
       // ── Open Graph
@@ -304,7 +304,7 @@ export const Route = createFileRoute("/")({
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "Amit Chakraborty" },
-      { name: "msapplication-TileColor", content: "#16A07C" },
+      { name: "msapplication-TileColor", content: "#7C3AED" },
     ],
     links: [
       { rel: "canonical", href: SITE_URL },

@@ -5,6 +5,9 @@ import { callMem0Search } from "@/lib/api/memory.functions";
 
 type Body = { messages?: UIMessage[]; userId?: string };
 
+/** Minimum relevance score to include a memory in RAG context */
+const SCORE_THRESHOLD = 0.4;
+
 function extractText(msg: UIMessage | undefined): string {
   if (!msg) return "";
   const parts = (msg as unknown as { parts?: Array<{ type: string; text?: string }> }).parts;
@@ -26,18 +29,31 @@ export const Route = createFileRoute("/api/chat")({
         const key = process.env.LOVABLE_API_KEY;
         if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
-        // RAG: pull mem0 memories for the latest user message
+        // RAG: pull mem0 memories for the latest user message with score threshold
         let memoryContext = "";
+        const memoryHits: Array<{ memory: string; category: string; score: string }> = [];
         const lastUser = [...messages].reverse().find((m) => m.role === "user");
         const query = extractText(lastUser);
         const uid = (userId && userId.trim()) || "anon_voice_visitor";
+
         if (query && process.env.MEM0_API_KEY) {
           try {
-            const hits = await callMem0Search(query, uid, 6);
-            if (hits.length) {
+            const hits = await callMem0Search(query, uid, 8);
+            // Filter by score threshold
+            const relevant = hits.filter((h) => parseFloat(h.score) >= SCORE_THRESHOLD);
+            if (relevant.length) {
               memoryContext =
                 "Relevant memories about the user (use only if helpful):\n" +
-                hits.map((h, i) => `${i + 1}. [${h.category}] ${h.memory} (score ${h.score})`).join("\n");
+                relevant.map((h, i) => `${i + 1}. [${h.category}] ${h.memory} (score ${h.score})`).join("\n");
+
+              // Track hits to return as metadata
+              for (const h of relevant) {
+                memoryHits.push({
+                  memory: h.memory,
+                  category: h.category,
+                  score: h.score,
+                });
+              }
             }
           } catch (err) {
             console.warn("[chat] mem0 RAG failed:", err);
@@ -51,6 +67,7 @@ export const Route = createFileRoute("/api/chat")({
           "You are Amit's portfolio assistant — a calm, concise AI guide grounded in mem0 context memory.",
           "Answer with crisp, plain language. Use markdown only when it clarifies (lists, code).",
           "If memories below are relevant, weave them in naturally; if not, ignore them.",
+          "Keep responses under 200 words unless the user asks for detail.",
           memoryContext,
         ]
           .filter(Boolean)
