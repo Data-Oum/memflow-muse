@@ -388,6 +388,7 @@ export function ContactFooter({ showToast }: { showToast: (m: string) => void })
                 {META_ROWS.map(([k, v]) => (
                   <div
                     key={k}
+                    className="cf-meta-row"
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
@@ -395,8 +396,6 @@ export function ContactFooter({ showToast }: { showToast: (m: string) => void })
                       padding: "10px 24px",
                       transition: "background 0.12s",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.025)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                   >
                     <span
                       style={{
