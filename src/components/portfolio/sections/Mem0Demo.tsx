@@ -247,6 +247,8 @@ export function Mem0Demo({
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              flexWrap: "wrap",
+              gap: 6,
             }}
           >
             <span>mem0 · add()</span>
@@ -261,11 +263,24 @@ export function Mem0Demo({
                   padding: "2px 8px",
                   borderRadius: "var(--r-full)",
                 }}
+                title={apiMode === "mock" ? "MEM0_API_KEY missing — running mock. Add it in Lovable Secrets to enable real RAG." : "Live mem0 API"}
               >
                 {apiMode === "real" ? "● API Connected" : "○ Local Demo Mode"}
               </span>
             )}
           </div>
+
+          <RecentSearches
+            visitorId={visitorId}
+            source="mem0_demo"
+            limit={5}
+            refreshKey={searchRefresh}
+            onSelect={(q) => {
+              setInput(q);
+              setSearchQ(q);
+              setShowSearch(true);
+            }}
+          />
 
           <textarea
             value={input}
