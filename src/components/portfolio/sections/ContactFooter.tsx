@@ -600,6 +600,13 @@ export function ContactFooter({ showToast }: { showToast: (m: string) => void })
 
       {/* Responsive styles */}
       <style>{`
+        .cf-email-cta:hover {
+          transform: translateY(-2px);
+          border-color: rgba(124,58,237,0.55) !important;
+          box-shadow: 0 12px 32px -12px rgba(124,58,237,0.45);
+        }
+        .cf-email-cta:active { transform: translateY(0); }
+        .cf-meta-row:hover { background: rgba(255,255,255,0.025); }
         @media (max-width: 680px) {
           .cf-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
           .cf-footer-row { grid-template-columns: 1fr !important; gap: 12px !important; }
