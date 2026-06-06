@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Project } from "./data/projects";
 import { ClickInstrumentationLayer } from "./sections/ClickInstrumentationLayer";
 import { ContactFooter } from "./sections/ContactFooter";
