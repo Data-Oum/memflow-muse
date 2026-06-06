@@ -5,6 +5,8 @@ import { Mic, MicOff, Send, Square, Volume2, VolumeX, Loader2 } from "lucide-rea
 import ReactMarkdown from "react-markdown";
 import { Section } from "../ui/Section";
 import { Label } from "../ui/Label";
+import { logSearch } from "@/lib/api/search-history.functions";
+import { useEnvHealth } from "@/hooks/use-env-health";
 
 /* Web Speech API typing — minimal */
 type SR = {
@@ -40,6 +42,8 @@ const STORAGE_KEY = "voicechat_history_v1";
 
 export function VoiceChat({ visitorId }: { visitorId: string }) {
   const transport = useMemo(() => new DefaultChatTransport({ api: "/api/chat" }), []);
+  const { data: envHealth } = useEnvHealth();
+  const gatewayOffline = envHealth ? envHealth.missing.includes("LOVABLE_API_KEY") : false;
   const [input, setInput] = useState("");
   const [interim, setInterim] = useState("");
   const [listening, setListening] = useState(false);
@@ -104,10 +108,19 @@ export function VoiceChat({ visitorId }: { visitorId: string }) {
   function send(text: string) {
     const t = text.trim();
     if (!t || busy) return;
+    if (gatewayOffline) return;
     lastPromptRef.current = t;
     setInput("");
     setInterim("");
     void sendMessage({ text: t }, { body: { userId: visitorId } });
+    void logSearch({
+      data: {
+        visitorId,
+        source: "voice_chat",
+        query: t.slice(0, 500),
+        metadata: { mode: "chat" },
+      },
+    }).catch(() => {});
   }
 
   function stopAll() {
