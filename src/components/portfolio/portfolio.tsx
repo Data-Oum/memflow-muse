@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Project } from "./data/projects";
 import { ClickInstrumentationLayer } from "./sections/ClickInstrumentationLayer";
 import { ContactFooter } from "./sections/ContactFooter";
+import { EnvHealthBanner } from "./sections/EnvHealthBanner";
 import { Hero } from "./sections/Hero";
 import { Nav } from "./sections/Nav";
 import { ProjectModal } from "./sections/ProjectModal";
@@ -58,6 +59,7 @@ export function Portfolio() {
       <Toast message={toast} />
       <VoiceChatDialog visitorId={visitorId} />
       <PwaInstallPrompt />
+      <EnvHealthBanner />
 
       {selectedProject && (
         <ProjectModal project={selectedProject} onClose={() => setSelectedProject(null)} />
