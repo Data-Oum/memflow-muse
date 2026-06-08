@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { useSmoothScroll } from "@/hooks/use-smooth-scroll";
+import { DevHealthPanel, recordChunkError } from "@/components/portfolio/sections/DevHealthPanel";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -154,6 +155,40 @@ function RootComponent() {
   // Lenis smooth scroll (initialised once at root — all pages benefit)
   useSmoothScroll();
 
+  // Global 504 / ChunkLoadError interceptor — feeds DevHealthPanel log
+  useEffect(() => {
+    const handler = (event: ErrorEvent) => {
+      const err = event.error;
+      const isChunk =
+        err instanceof Error &&
+        (err.name === "ChunkLoadError" ||
+          err.message.includes("Loading chunk") ||
+          err.message.includes("Failed to fetch dynamically imported module") ||
+          err.message.includes("504"));
+      if (isChunk) {
+        recordChunkError(err, (err as { request?: string }).request ?? event.filename);
+      }
+    };
+    const unhandled = (event: PromiseRejectionEvent) => {
+      const reason = event.reason;
+      const isChunk =
+        reason instanceof Error &&
+        (reason.name === "ChunkLoadError" ||
+          reason.message.includes("Loading chunk") ||
+          reason.message.includes("Failed to fetch dynamically imported module") ||
+          reason.message.includes("504"));
+      if (isChunk) {
+        recordChunkError(reason);
+      }
+    };
+    window.addEventListener("error", handler);
+    window.addEventListener("unhandledrejection", unhandled);
+    return () => {
+      window.removeEventListener("error", handler);
+      window.removeEventListener("unhandledrejection", unhandled);
+    };
+  }, []);
+
   useEffect(() => {
     if (!(typeof window !== "undefined" && "serviceWorker" in navigator)) return;
 
@@ -189,6 +224,8 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      {/* Dev-only diagnostic overlay — Ctrl/Cmd+Shift+H */}
+      <DevHealthPanel />
     </QueryClientProvider>
   );
 }

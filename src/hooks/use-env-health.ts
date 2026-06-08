@@ -4,6 +4,8 @@ import { checkRequiredEnv } from "@/lib/api/env-check.functions";
 export type EnvHealth = {
   ok: boolean;
   missing: string[];
+  warnings: string[];
+  lovablePresent: boolean;
   mem0Mode: "real" | "mock";
 };
 
@@ -19,7 +21,13 @@ async function fetchHealth(): Promise<EnvHealth> {
       return cache;
     })
     .catch(() => {
-      cache = { ok: false, missing: ["unknown"], mem0Mode: "mock" };
+      cache = {
+        ok: true,
+        missing: [],
+        warnings: ["Could not reach env-check endpoint"],
+        lovablePresent: false,
+        mem0Mode: "mock",
+      };
       return cache;
     })
     .finally(() => {
@@ -46,9 +54,7 @@ export function useEnvHealth() {
         setLoading(false);
       }
     });
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
   const refetch = useCallback(async () => {

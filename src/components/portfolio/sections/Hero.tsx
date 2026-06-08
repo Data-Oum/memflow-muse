@@ -197,28 +197,44 @@ const PortraitCard = memo(function PortraitCard() {
             fontFamily: "var(--font-mono)", fontSize: 9.5,
             color: "#22C55E", letterSpacing: "0.04em",
           }}>
-            Available · Remote
+            Available · Remote · IST
           </span>
         </div>
 
         {/* Name */}
         <div style={{
-          fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 21,
-          color: "#fff", letterSpacing: "-0.03em", lineHeight: 1.15,
+          fontFamily: "var(--font-serif)", fontWeight: 400, fontSize: 23,
+          color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.15,
         }}>
           Amit Chakraborty
         </div>
 
         {/* Role */}
         <div style={{
-          fontFamily: "var(--font-mono)", fontSize: 10,
+          fontFamily: "var(--font-mono)", fontSize: 9.5,
           color: "rgba(155,120,255,0.85)", marginTop: 4, letterSpacing: "0.03em",
         }}>
-          Principal Architect · Kolkata, India
+          Principal Architect · 8+ yrs · 18+ apps shipped
+        </div>
+
+        {/* Skill chips row */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 10 }}>
+          {["React Native", "AI/ML", "Web3", "TypeScript"].map((chip) => (
+            <span key={chip} style={{
+              fontFamily: "var(--font-mono)", fontSize: 8,
+              color: "rgba(255,255,255,0.45)",
+              background: "rgba(255,255,255,0.06)",
+              border: "0.5px solid rgba(255,255,255,0.10)",
+              borderRadius: 5, padding: "2px 7px",
+              letterSpacing: "0.03em",
+            }}>
+              {chip}
+            </span>
+          ))}
         </div>
 
         {/* Social icons on portrait */}
-        <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
+        <div style={{ display: "flex", gap: 6, marginTop: 11 }}>
           {SOCIALS.map(({ label, href, Icon }) => (
             <a
               key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
@@ -832,7 +848,7 @@ export function Hero() {
       style={{
         background: "#FFFFFF",
         paddingTop: "calc(54px + 64px)",
-        paddingBottom: 88,
+        paddingBottom: 104,
         paddingLeft: 24,
         paddingRight: 24,
         position: "relative",
@@ -892,15 +908,15 @@ export function Hero() {
           <h1
             className="h-item"
             style={{
-              fontFamily: "var(--font-display)",
-              fontSize: "clamp(2.1rem, 4.8vw, 3.4rem)",
+              fontFamily: "var(--font-serif)",
+              fontSize: "clamp(2.2rem, 4.8vw, 3.5rem)",
               color: "var(--ink-primary)",
-              lineHeight: 1.06, fontWeight: 700,
-              marginBottom: 16, letterSpacing: "-0.03em", opacity: 0,
+              lineHeight: 1.08, fontWeight: 400,
+              marginBottom: 16, letterSpacing: "-0.02em", opacity: 0,
             }}
           >
             Engineer who builds systems{" "}
-            <span style={{ color: "var(--signal)" }}>that remember.</span>
+            <em style={{ color: "var(--signal)", fontStyle: "italic" }}>that remember.</em>
           </h1>
 
           {/* Subtext */}
@@ -974,10 +990,27 @@ export function Hero() {
               amit@devamit.co.in
             </span>
           </div>
+
+          {/* Career journey timeline */}
+          <div className="h-item" style={{ marginTop: 36, opacity: 0 }}>
+            <div style={{
+              fontFamily: "var(--font-mono)", fontSize: 9.5,
+              color: "var(--signal)", letterSpacing: "0.08em",
+              textTransform: "uppercase", marginBottom: 16,
+              display: "flex", alignItems: "center", gap: 8,
+            }}>
+              <span style={{
+                display: "inline-block", width: 16, height: 1,
+                background: "var(--signal)", opacity: 0.5,
+              }} />
+              journey
+            </div>
+            <CareerJourney />
+          </div>
         </div>
 
         {/* ── RIGHT: swipeable card stack ── */}
-        <div className="hide-on-mobile" style={{ paddingBottom: 56 }}>
+        <div className="hero-stack-col" style={{ paddingBottom: 56 }}>
           <SwipeableStack />
         </div>
       </div>
@@ -987,7 +1020,10 @@ export function Hero() {
         @keyframes pm-pulse      { 0%,100%{opacity:1;transform:scale(1);}    50%{opacity:0.55;transform:scale(0.8);}  }
         @keyframes pm-nodepulse  { 0%,100%{transform:scale(1);opacity:0.7;}  50%{transform:scale(1.10);opacity:1.0;}  }
         @keyframes pm-tooltip-in { from{opacity:0;transform:translateX(-50%) translateY(4px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
-        @media (max-width: 720px) { .hero-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 860px) {
+          .hero-grid { grid-template-columns: 1fr !important; }
+          .hero-stack-col { display: none !important; }
+        }
         .h-item { opacity: 0; }
       `}</style>
     </section>
