@@ -23,7 +23,7 @@ function DisplayCard({
   return (
     <div
       className={cn(
-        "relative flex h-36 w-[26rem] select-none flex-col justify-between rounded-xl border p-4",
+        "relative flex h-36 w-[26rem] select-none flex-col justify-between rounded-xl border-[0.5px]p-4",
         "after:absolute after:-right-1 after:top-[-5%] after:h-[110%] after:w-[20rem]",
         "after:[background:linear-gradient(to_left,_#ffffff_60%,_transparent)] dark:after:[background:linear-gradient(to_left,_#0f0f0f_60%,_transparent)]",
         className,
@@ -36,7 +36,7 @@ function DisplayCard({
       <div className="flex items-center gap-3">
         <span
           className={cn(
-            "relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border text-2xl",
+            "relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-[0.5px]text-2xl",
             iconClassName,
           )}
           style={{
@@ -53,10 +53,14 @@ function DisplayCard({
           {title}
         </p>
       </div>
-      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>
-        {description}
-      </p>
-      <p style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", fontVariantNumeric: "tabular-nums" }}>
+      <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.5 }}>{description}</p>
+      <p
+        style={{
+          fontSize: 11,
+          color: "rgba(255,255,255,0.28)",
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
         {date}
       </p>
     </div>
@@ -74,7 +78,8 @@ export function DisplayCards({ cards }: DisplayCardsProps) {
       title: "Memory Recall",
       description: "Retrieved 0.98 relevance match for react_native expertise",
       date: "2ms ago",
-      className: "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:grayscale-0 before:z-[-1] hover:before:opacity-0 before:opacity-100 transition-all duration-700 before:transition-all before:duration-700",
+      className:
+        "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:grayscale-0 before:z-[-1] hover:before:opacity-0 before:opacity-100 transition-all duration-700 before:transition-all before:duration-700",
       iconClassName: "border-purple-300/20",
       titleClassName: "text-purple-200",
     },
@@ -83,7 +88,8 @@ export function DisplayCards({ cards }: DisplayCardsProps) {
       title: "AI Pipelines",
       description: "HIPAA-compliant RAG pipeline · 99.9% uptime at Synapsis",
       date: "0.95 score",
-      className: "[grid-area:stack] translate-x-12 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:grayscale-0 before:z-[-1] hover:before:opacity-0 before:opacity-100 transition-all duration-700 before:transition-all before:duration-700",
+      className:
+        "[grid-area:stack] translate-x-12 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:grayscale-0 before:z-[-1] hover:before:opacity-0 before:opacity-100 transition-all duration-700 before:transition-all before:duration-700",
       iconClassName: "border-violet-300/20",
       titleClassName: "text-violet-200",
     },

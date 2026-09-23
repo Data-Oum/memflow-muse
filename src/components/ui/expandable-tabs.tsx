@@ -1,8 +1,8 @@
 "use client";
-import { useState, useRef, useLayoutEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
+import { useState } from "react";
 
 interface Tab {
   id: string;
@@ -17,12 +17,7 @@ interface ExpandableTabsProps {
   className?: string;
 }
 
-export function ExpandableTabs({
-  tabs,
-  activeTab,
-  onTabChange,
-  className,
-}: ExpandableTabsProps) {
+export function ExpandableTabs({ tabs, activeTab, onTabChange, className }: ExpandableTabsProps) {
   const [hovered, setHovered] = useState<string | null>(null);
   const [active, setActive] = useState<string>(activeTab ?? tabs[0]?.id ?? "");
   const current = activeTab ?? active;
@@ -34,7 +29,7 @@ export function ExpandableTabs({
 
   return (
     <div
-      className={cn("flex items-center gap-1 rounded-full border p-1", className)}
+      className={cn("flex items-center gap-1 rounded-full border-[0.5px]p-1", className)}
       style={{
         background: "rgba(255,255,255,0.06)",
         borderColor: "rgba(255,255,255,0.09)",
@@ -63,9 +58,7 @@ export function ExpandableTabs({
               border: "none",
               cursor: "pointer",
               background: isActive ? "rgba(124,58,237,0.18)" : "transparent",
-              color: isActive
-                ? "#A855F7"
-                : "rgba(255,255,255,0.45)",
+              color: isActive ? "#A855F7" : "rgba(255,255,255,0.45)",
               transition: "color 0.18s, background 0.18s",
               fontSize: 13,
               fontWeight: isActive ? 500 : 400,

@@ -41,7 +41,7 @@ export function DarkStrip() {
         <line x1="0" y1="40" x2="80" y2="40" stroke="#7C3AED" strokeWidth="0.4" />
       </svg>
 
-      {/* Top border */}
+      {/* Top border-[0.5px]*/}
       <div
         aria-hidden
         style={{
@@ -50,7 +50,8 @@ export function DarkStrip() {
           left: 0,
           right: 0,
           height: 1,
-          background: "linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.35) 50%, transparent 100%)",
+          background:
+            "linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.35) 50%, transparent 100%)",
         }}
       />
 
@@ -68,12 +69,11 @@ export function DarkStrip() {
           margin: 0,
         }}
       >
-        Memory is what makes AI useful.{" "}
-        <span style={{ color: "var(--signal)" }}>Architecture</span>{" "}
+        Memory is what makes AI useful. <span style={{ color: "var(--signal)" }}>Architecture</span>{" "}
         is what makes engineers reliable.
       </p>
 
-      {/* Bottom border */}
+      {/* Bottom border-[0.5px]*/}
       <div
         aria-hidden
         style={{
@@ -82,7 +82,8 @@ export function DarkStrip() {
           left: 0,
           right: 0,
           height: 1,
-          background: "linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.35) 50%, transparent 100%)",
+          background:
+            "linear-gradient(90deg, transparent 0%, rgba(124,58,237,0.35) 50%, transparent 100%)",
         }}
       />
     </div>
